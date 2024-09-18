@@ -1,16 +1,15 @@
-
+# Declare the static IP for the NAT gateway
 resource "google_compute_address" "nat_ip" {
   name   = "nat-ip"
   region = var.region
 }
 
+# Create the GKE cluster
 resource "google_container_cluster" "gke_cluster" {
   name               = "militaryknowledge-cluster"
   location           = var.region
-  #initial_node_count = 1  # no initial node count if using node pools
-
-  network    = var.vpc_name
-  subnetwork = var.private_subnet
+  network            = var.vpc_name
+  subnetwork         = var.private_subnet
 
   remove_default_node_pool = true
 
@@ -25,8 +24,10 @@ resource "google_container_cluster" "gke_cluster" {
   }
 }
 
+# Data source for client configuration
 data "google_client_config" "default" {}
 
+# Output for kubeconfig
 output "kubeconfig" {
   value = {
     cluster_name           = google_container_cluster.gke_cluster.name
@@ -36,16 +37,17 @@ output "kubeconfig" {
     cluster_ca_certificate = base64decode(google_container_cluster.gke_cluster.master_auth[0].cluster_ca_certificate)
     token                  = data.google_client_config.default.access_token
   }
-    sensitive              = true
-  }
+  sensitive = true
+}
 
-
+# Create the NAT router
 resource "google_compute_router" "nat_router" {
   name    = "nat-router"
   region  = var.region
   network = var.vpc_name
 }
 
+# Configure the NAT gateway
 resource "google_compute_router_nat" "nat_gateway" {
   name                   = "nat-gateway"
   router                 = google_compute_router.nat_router.name
@@ -53,8 +55,7 @@ resource "google_compute_router_nat" "nat_gateway" {
   nat_ip_allocate_option = "MANUAL_ONLY"
 
   nat_ips                = [
-    google_compute_address.nat_ip,  
-    google_compute_address.nat_gateway_ip.address
+    google_compute_address.nat_ip.address  # Use only the nat_ip we declared
   ]
 
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
@@ -70,10 +71,12 @@ resource "google_compute_router_nat" "nat_gateway" {
   }
 }
 
+# Output for the NAT IP address
 output "nat_ip" {
   value = google_compute_address.nat_ip.address
 }
 
+# Output for the GKE cluster endpoint
 output "cluster_endpoint" {
   value = google_container_cluster.gke_cluster.endpoint
 }
