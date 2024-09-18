@@ -14,3 +14,4 @@ gcloud iam service-accounts add-iam-policy-binding 810277572019-compute@develope
 
 gcloud projects add-iam-policy-binding militaryknowledge --member "user:dimitri.griparis@ctengineeringgroup.com" --role "roles/container.admin"    
 
+nat gateway has been remove from folder gke and will be added to infra when we are ready to implement this as a solution since the nat gateway has a charge for the static ip
