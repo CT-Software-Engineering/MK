@@ -52,16 +52,16 @@ resource "google_compute_router_nat" "nat_gateway" {
   name                   = "nat-gateway"
   router                 = google_compute_router.nat_router.name
   region                 = google_compute_router.nat_router.region
-  nat_ip_allocate_option = "MANUAL_ONLY"
+  nat_ip_allocate_option  = "MANUAL_ONLY"
 
   nat_ips                = [
-    google_compute_address.nat_ip.address  # Use only the nat_ip we declared
+    google_compute_address.nat_ip.address 
   ]
 
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 
   depends_on = [
-    google_compute_address.nat_ip,  
+    google_compute_address.nat_ip,
     google_compute_router.nat_router
   ]
 
