@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-    GCP_SA_KEY = credentials('SERVICE_ACCOUNT_KEY')    
+    
     GCP_PROJECT_ID = 'militaryknowledge'
     GKE_CLUSTER_NAME = 'my-gke-cluster'
     GKE_CLUSTER_ZONE = 'europe-west1-b'
