@@ -1,0 +1,114 @@
+substitutions:
+  _HELM_VERSION: "v3.11.2"
+  _PROJECT_ID: "militaryknowledge"
+  _CLUSTER_NAME: "my-gke-cluster"
+  _CLUSTER_LOCATION: "europe-west1"
+  _JENKINS_VERSION: "2.401.1"  # Add this line for Jenkins version
+
+steps:
+# Step 1: Install kubectl and configure Git
+- name: 'gcr.io/cloud-builders/git'
+  entrypoint: 'sh'
+  args:
+  - '-c'
+  - |
+    git config --global init.defaultBranch main
+    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    chmod +x kubectl
+    mv kubectl /usr/local/bin/kubectl
+
+# Step 2: Install Helm in Alpine and ensure curl is available
+- name: 'alpine:latest'
+  entrypoint: 'sh'
+  args:
+  - '-c'
+  - |
+    apk add --no-cache curl
+    curl -LO https://get.helm.sh/helm-${_HELM_VERSION}-linux-amd64.tar.gz
+    tar -zxvf helm-${_HELM_VERSION}-linux-amd64.tar.gz
+    mv linux-amd64/helm /usr/local/bin/helm
+    chmod +x /usr/local/bin/helm
+    rm -rf linux-amd64 helm-${_HELM_VERSION}-linux-amd64.tar.gz
+
+# Step 3: Set project ID and run gcloud commands
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: 'sh'
+  args:
+  - '-c'
+  - |
+    gcloud config set project ${_PROJECT_ID}
+    gcloud container clusters get-credentials ${_CLUSTER_NAME} --location ${_CLUSTER_LOCATION}
+
+# Step 4: Install and use Helm
+- name: 'alpine'
+  entrypoint: 'sh'
+  args:
+  - '-c'
+  - |
+    # Install necessary tools
+    apk add --no-cache curl
+
+    # Install Helm
+    curl -LO https://get.helm.sh/helm-${_HELM_VERSION}-linux-amd64.tar.gz
+    tar -zxvf helm-${_HELM_VERSION}-linux-amd64.tar.gz
+    mv linux-amd64/helm /usr/local/bin/helm
+    chmod +x /usr/local/bin/helm
+    rm -rf linux-amd64 helm-${_HELM_VERSION}-linux-amd64.tar.gz
+
+    # Use Helm
+    helm repo add stable https://charts.helm.sh/stable
+    helm repo update
+    # Example: helm install my-release stable/nginx
+
+# Step 5: Install and debug Jenkins startup
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    # Pull Jenkins Docker image
+    echo "Pulling Jenkins image..."
+    docker pull jenkins/jenkins:${_JENKINS_VERSION}-lts
+
+    # Create a Docker network for Jenkins
+    echo "Creating Docker network..."
+    docker network create jenkins
+
+    # Run Jenkins container without health check
+    echo "Starting Jenkins container..."
+    docker run --name jenkins-server --network jenkins -d -p 8080:8080 -p 50000:50000 \
+      -v jenkins_home:/var/jenkins_home jenkins/jenkins:${_JENKINS_VERSION}-lts
+
+    # Wait a bit and check container status
+    sleep 30
+    echo "Container status:"
+    docker ps -a | grep jenkins-server
+
+    # Check container logs
+    echo "Container logs:"
+    docker logs jenkins-server
+
+    # Check if Jenkins process is running inside the container
+    echo "Checking Jenkins process:"
+    docker exec jenkins-server ps aux | grep jenkins
+
+    # Check if Jenkins home directory is properly mounted
+    echo "Checking Jenkins home directory:"
+    docker exec jenkins-server ls -la /var/jenkins_home
+
+    # Try to access Jenkins web interface
+    echo "Attempting to access Jenkins web interface:"
+    curl -I http://localhost:8080 || echo "Failed to access Jenkins web interface"
+
+    # Print resource usage
+    echo "Container resource usage:"
+    docker stats --no-stream jenkins-server
+
+    # If all else fails, try to get any error messages
+    echo "Checking for error messages in container logs:"
+    docker logs jenkins-server 2>&1 | grep -i error
+
+    echo "Debug information collection complete."
+
+
+logsBucket: "gs://810277572019-europe-west3-cloudbuild-logs"
