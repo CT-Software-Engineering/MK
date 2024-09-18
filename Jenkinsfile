@@ -45,7 +45,7 @@ pipeline {
             steps{
                 script{
                     dir('GKE'){
-                         sh 'terraform init -reconfigure'
+                         sh 'terraform init'
                     }
                 }
             }
