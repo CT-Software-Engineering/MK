@@ -13,3 +13,4 @@ gcloud compute addresses create nat_gateway --region europe-west1 --project mili
 gcloud iam service-accounts add-iam-policy-binding 810277572019-compute@developer.gserviceaccount.com --member "user:dimitri.griparis@ctengineeringgroup.com" --role "roles/iam.serviceAccountUser" --project militaryknowledge
 
 gcloud projects add-iam-policy-binding militaryknowledge --member "user:dimitri.griparis@ctengineeringgroup.com" --role "roles/container.admin"    
+
