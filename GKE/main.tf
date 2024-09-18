@@ -51,8 +51,7 @@ resource "google_compute_router_nat" "nat_gateway" {
   router                 = google_compute_router.nat_router.name
   region                 = google_compute_router.nat_router.region
   nat_ip_allocate_option = "MANUAL ONLY"
-  nat_ips                = [google_compute_address.my_static_ip.address,
-                           google_compute_address.nat_gateway_ip.address, 
+  nat_ips                = [google_compute_address.nat_ip
   ]
 
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
