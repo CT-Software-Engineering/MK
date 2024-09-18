@@ -15,7 +15,7 @@ pipeline {
                 script {
                     checkout scmGit(branches: [[name: '*/main']],
                                     extensions: [],
-                                    userRemoteConfigs: [[url: 'git@github.com:CT-Software-Engineering/GKEMilitary.git', credentialsId: "${GITHUB_CREDENTIALS_ID}"]])
+                                    userRemoteConfigs: [[url: 'git@github.com:CT-Software-Engineering/MK.git', credentialsId: "${GITHUB_CREDENTIALS_ID}"]])
                 }
             }
         }
@@ -116,7 +116,7 @@ pipeline {
         stage('Update Kubeconfig') {
             steps {
                 script {
-                    sh 'aws eks update-kubeconfig --name military --kubeconfig "/var/lib/jenkins/workspace/military/.kube/config"'
+                    sh 'aws eks update-kubeconfig --name mk --kubeconfig "/var/lib/jenkins/workspace/mk/.kube/config"'
                 }
             }
         }
@@ -124,10 +124,10 @@ pipeline {
         stage('Deploying Jenkins') {
             steps {
                 script {
-                    //sh 'helm upgrade jenkins bitnami/jenkins --namespace military --create-namespace --kubeconfig "/var/lib/jenkins/workspace/military/.kube/config"'
+                    //sh 'helm upgrade jenkins bitnami/jenkins --namespace mk --create-namespace --kubeconfig "/var/lib/jenkins/workspace/mk/.kube/config"'
                     sh 'helm install j
-                    enkins bitnami/jenkins --namespace military --create-namespace --kubeconfig "/var/lib/jenkins/workspace/military/.kube/config"'
-                    //sh 'helm uninstall jenkins bitnami/jenkins --namespace military --create-namespace --kubeconfig "/var/lib/jenkins/workspace/military/.kube/config"'
+                    enkins bitnami/jenkins --namespace mk --create-namespace --kubeconfig "/var/lib/jenkins/workspace/mk/.kube/config"'
+                    //sh 'helm uninstall jenkins bitnami/jenkins --namespace mk --create-namespace --kubeconfig "/var/lib/jenkins/workspace/mk/.kube/config"'
                     
                 }
             }
@@ -136,8 +136,8 @@ pipeline {
         stage('Verify Jenkins Deployment') {
             steps {
                 script {
-                    sh 'kubectl get pods -n military --kubeconfig "$KUBECONFIG"'
-                    sh 'kubectl get svc -n military --kubeconfig "$KUBECONFIG"'
+                    sh 'kubectl get pods -n mk --kubeconfig "$KUBECONFIG"'
+                    sh 'kubectl get svc -n mk --kubeconfig "$KUBECONFIG"'
                 }
             }
         }
