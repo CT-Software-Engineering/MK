@@ -1,9 +1,3 @@
-# Declare the static IP for the NAT gateway
-resource "google_compute_address" "nat_ip" {
-  name   = "nat-ip"
-  region = var.region
-}
-
 # Create the GKE cluster
 resource "google_container_cluster" "gke_cluster" {
   name               = "militaryknowledge-cluster"
@@ -38,41 +32,6 @@ output "kubeconfig" {
     token                  = data.google_client_config.default.access_token
   }
   sensitive = true
-}
-
-# Create the NAT router
-resource "google_compute_router" "nat_router" {
-  name    = "nat-router"
-  region  = var.region
-  network = var.vpc_name
-}
-
-# Configure the NAT gateway
-resource "google_compute_router_nat" "nat_gateway" {
-  name                   = "nat-gateway"
-  router                 = google_compute_router.nat_router.name
-  region                 = google_compute_router.nat_router.region
-  nat_ip_allocate_option  = "MANUAL_ONLY"
-
-  nat_ips                = ["146.148.5.132"]
-  
-
-  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
-
-  depends_on = [
-    google_compute_address.nat_ip,
-    google_compute_router.nat_router
-  ]
-
-  log_config {
-    enable = true
-    filter = "ERRORS_ONLY"
-  }
-}
-
-# Output for the NAT IP address
-output "nat_ip" {
-  value = google_compute_address.nat_ip.address
 }
 
 # Output for the GKE cluster endpoint
