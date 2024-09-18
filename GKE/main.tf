@@ -7,7 +7,7 @@ resource "google_compute_address" "nat_ip" {
 resource "google_container_cluster" "gke_cluster" {
   name               = "militaryknowledge-cluster"
   location           = var.region
-  initial_node_count = 1
+  #initial_node_count = 1  # no initial node count if using node pools
 
   network    = var.vpc_name
   subnetwork = var.private_subnet
