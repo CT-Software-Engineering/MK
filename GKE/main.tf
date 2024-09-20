@@ -6,12 +6,18 @@ resource "google_container_cluster" "gke_cluster" {
   subnetwork         = var.private_subnet
   deletion_protection = false
 
- # remove_default_node_pool = true
+ remove_default_node_pool = true
+ initial_node_count = 1
+
+ node_locations = [var.zone]
 
   node_pool {
     name       = "custom-node-pool"
     node_count = 1
-
+ autoscaling {
+    min_node_count = 1
+    max_node_count = 1
+  }
     node_config {
       machine_type = var.machine_type
       service_account = "gke-service-account@militaryknowledge.iam.gserviceaccount.com"
