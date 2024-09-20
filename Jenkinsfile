@@ -92,6 +92,30 @@ pipeline {
         }
 /*
 
+        stage('Disable Deletion Protection and Update GKE Cluster') {
+    steps {
+        script {
+            // Install required Python library
+            sh 'pip install google-cloud-container'
+
+            // Create and run Python script
+            writeFile file: 'disable_deletion_protection.py', text: '''
+                # Python script content here
+            '''
+            sh 'python disable_deletion_protection.py'
+
+            // Refresh Terraform state
+            dir('GKE') {
+                sh 'terraform refresh'
+            }
+
+            // Apply Terraform changes
+            dir('GKE') {
+                sh 'terraform apply --auto-approve'
+            }
+        }
+    }
+}
         stage('Initializing Helm') {
             steps {
                 script {
