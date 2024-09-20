@@ -4,6 +4,7 @@ resource "google_container_cluster" "gke_cluster" {
   location           = var.region
   network            = var.vpc_name
   subnetwork         = var.private_subnet
+  deletion_protection = false
 
  # remove_default_node_pool = true
 
