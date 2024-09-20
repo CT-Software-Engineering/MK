@@ -5,7 +5,7 @@ resource "google_container_cluster" "gke_cluster" {
   network            = var.vpc_name
   subnetwork         = var.private_subnet
 
-  remove_default_node_pool = true
+ # remove_default_node_pool = true
 
   node_pool {
     name       = "custom-node-pool"
