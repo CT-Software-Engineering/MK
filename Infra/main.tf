@@ -5,13 +5,6 @@ provider "google" {
 
 }
 
-# Enable Service Networking API
-resource "google_project_service" "service_networking" {
-  project = var.project_id
-  service = "servicenetworking.googleapis.com"
-
-  disable_on_destroy = false
-}
 resource "google_compute_instance" "jenkins-server" {
   name         = "jenkins-server"
   machine_type = "e2-medium"
