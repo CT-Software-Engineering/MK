@@ -13,6 +13,7 @@ resource "google_container_cluster" "gke_cluster" {
 
     node_config {
       machine_type = var.machine_type
+      service_account = "gke-service-account@militaryknowledge.iam.gserviceaccount.com"
       oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
     }
   }
