@@ -93,64 +93,15 @@ pipeline {
                 script{
                     dir('GKE'){
                          //sh 'terraform $action --auto-approve'
-                         sh 'terraform apply --auto-approve'
-                         //sh 'terraform destroy --auto-approve'
+                         //sh 'terraform apply --auto-approve'
+                         sh 'terraform destroy --auto-approve'
                     }
                 }
             }
         }
 /*
 
-        stage('Disable Deletion Protection') {
-    steps {
-        script {
-            // Install required Python library
-            sh 'pip install google-cloud-container'
-
-            // Create Python script
-            writeFile file: 'disable_deletion_protection.py', text: '''
-from google.cloud import container_v1
-from google.api_core import exceptions
-
-def disable_deletion_protection(project_id, location, cluster_name):
-    client = container_v1.ClusterManagerClient()
-    name = f"projects/{project_id}/locations/{location}/clusters/{cluster_name}"
-
-    try:
-        # Get the current cluster configuration
-        cluster = client.get_cluster(name=name)
-
-        # Update the deletion protection
-        cluster.deletion_protection = False
-
-        # Prepare the update mask
-        update_mask = container_v1.types.FieldMask(paths=['deletion_protection'])
-
-        # Send the update request
-        operation = client.update_cluster(
-            name=name,
-            update=cluster,
-            update_mask=update_mask
-        )
-
-        # Wait for the operation to complete
-        operation.result()
-        print("Deletion protection disabled successfully.")
-    except exceptions.GoogleAPICallError as e:
-        print(f"Error disabling deletion protection: {e}")
-
-project_id = "militaryknowledge"
-location = "europe-west1"
-cluster_name = "militaryknowledge-cluster"
-
-disable_deletion_protection(project_id, location, cluster_name)
-'''
-
-            // Run the Python script
-            sh 'python disable_deletion_protection.py'
-        }
-    }
-}
+        
 
         stage('Initializing Helm') {
             steps {
