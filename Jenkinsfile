@@ -26,7 +26,7 @@ pipeline {
                 }        
             }
         }
-        
+
         stage('Checkout SCM') {
             steps {
                 script {
@@ -109,8 +109,8 @@ pipeline {
                 script{
                     dir('GKE'){
                          //sh 'terraform $action --auto-approve'
-                         //sh 'terraform apply --auto-approve'
-                         sh 'terraform destroy --auto-approve'
+                         sh 'terraform apply --auto-approve'
+                         //sh 'terraform destroy --auto-approve'
                     }
                 }
             }
