@@ -22,8 +22,11 @@ pipeline {
                         // Deploy to staging environment
                     } else if (envName == 'production') {
                         // Deploy to production environment
-
-                        
+                    }
+                }        
+            }
+        }
+        
         stage('Checkout SCM') {
             steps {
                 script {
