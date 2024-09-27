@@ -5,9 +5,9 @@ pipeline {
     GCP_PROJECT_ID = 'militaryknowledge'
     GKE_CLUSTER_NAME = 'my-gke-cluster'
     GKE_CLUSTER_ZONE = 'europe-west1-b'
-    GITHUB_CREDENTIALS_ID = '5b5a0dd1-d752-4ff7-ba16-2dc770a89b74' // Add this line
+    GITHUB_CREDENTIALS_ID = '92229892-c431-4b3b-927f-6e43e5be5946' // Add this line
     GCP_CREDENTIALS_ID = '0d25e897-f844-4817-822e-1c1c8ff664ee' // Add new GCP credentials ID
-    GOOGLE_APPLICATION_CREDENTIALS = credentials('0908ac63252abd9765af6a4aecea10820a7a4b5b')
+    #GOOGLE_APPLICATION_CREDENTIALS = credentials('0908ac63252abd9765af6a4aecea10820a7a4b5b')
 
     }
     stages {
@@ -16,7 +16,7 @@ pipeline {
                 script {
                     checkout scmGit(branches: [[name: '*/main']],
                                     extensions: [],
-                                    userRemoteConfigs: [[url: 'git@github.com:CT-Software-Engineering/MK.git', credentialsId: "${GITHUB_CREDENTIALS_ID}"]])
+                                    userRemoteConfigs: [[url: 'https://github.com/CT-Software-Engineering/MK.git', credentialsId: "${GITHUB_CREDENTIALS_ID}"]])
                 }
             }
         }
