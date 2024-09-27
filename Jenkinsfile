@@ -11,6 +11,19 @@ pipeline {
 
     }
     stages {
+
+        stage('Deploy to GCP') {
+            steps {
+                script {
+                    def envName = env.BRANCH_NAME
+                    if (envName == 'development') {
+                        // Deploy to development environment
+                    } else if (envName == 'staging') {
+                        // Deploy to staging environment
+                    } else if (envName == 'production') {
+                        // Deploy to production environment
+
+                        
         stage('Checkout SCM') {
             steps {
                 script {
