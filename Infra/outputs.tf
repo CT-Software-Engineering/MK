@@ -23,10 +23,10 @@ output "region" {
   value       = var.region
   description = "The region in which resources are created"
 }
-output "jenkins_server_ip" {
-  value       = google_compute_instance.jenkins-server.network_interface[0].access_config[0].nat_ip
-  description = "The public IP address of the Jenkins server"
-}
+# output "jenkins_server_ip" {
+#   value       = google_compute_instance.jenkins-server.network_interface[0].access_config[0].nat_ip
+#   description = "The public IP address of the Jenkins server"
+# }
 output "vpc_id" {
   value = google_compute_network.vpc.id
 }

@@ -5,26 +5,37 @@ resource "google_container_cluster" "gke_cluster" {
   network            = var.vpc_name
   subnetwork         = var.private_subnet
   deletion_protection = false
+  
 
- remove_default_node_pool = true
- initial_node_count = 1
-
- node_locations = [var.zone]
-
-  node_pool {
-    name       = "custom-node-pool"
-    node_count = 1
- autoscaling {
-    min_node_count = 1
-    max_node_count = 1
-  }
-    node_config {
-      machine_type = var.machine_type
-      service_account = "gke-service-account@militaryknowledge.iam.gserviceaccount.com"
-      oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
-    }
+  initial_node_count       = 1
+  
+  # Enable Workload Identity
+  workload_identity_config {
+    workload_pool = "${var.project_id}.svc.id.goog"
   }
 }
+ resource "google_container_node_pool" "primary_nodes" {
+  name       = "my-node-pool"
+  location   = var.region  # should match the cluster location
+  cluster    = google_container_cluster.gke_cluster.name
+  node_count = 1  # or your desired number of nodes
+  
+
+     node_config {
+       machine_type = var.machine_type
+       disk_size_gb = 20
+      workload_metadata_config {
+      mode = "GKE_METADATA"
+    }
+       preemptible = true
+       service_account = "gke-service-account@militaryknowledge.iam.gserviceaccount.com"
+       oauth_scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+
+
+     }     
+
+ }
+
 
 # Data source for client configuration
 data "google_client_config" "default" {}
@@ -38,6 +49,7 @@ output "kubeconfig" {
     client_key             = base64decode(google_container_cluster.gke_cluster.master_auth[0].client_key)
     cluster_ca_certificate = base64decode(google_container_cluster.gke_cluster.master_auth[0].cluster_ca_certificate)
     token                  = data.google_client_config.default.access_token
+    
   }
   sensitive = true
 }
@@ -45,4 +57,5 @@ output "kubeconfig" {
 # Output for the GKE cluster endpoint
 output "cluster_endpoint" {
   value = google_container_cluster.gke_cluster.endpoint
+  
 }
