@@ -116,31 +116,21 @@ pipeline {
             }
         }
 
-        stage('Initialize Terraform - Databases') {
-            steps {
-                script {
-                    dir('GKE/DB/graphdb') {
-                        sh 'terraform init'
-                    }
-                    dir('GKE/DB/postgresql') {
-                        sh 'terraform init'
-                    }
-                }
+        stage('Initialize and Apply Terraform - Databases') {
+    steps {
+        script {
+            dir('GKE/DB/graphdb') {
+                sh 'terraform init'
+                sh 'terraform apply --auto-approve'
+            }
+            dir('GKE/DB/postgresql') {
+                sh 'terraform init'
+                sh 'terraform apply --auto-approve'
             }
         }
+    }
+}
 
-        stage('Apply Terraform - Databases') {
-            steps {
-                script {
-                    dir('GKE/DB/graphdb') {
-                        sh 'terraform apply --auto-approve'
-                    }
-                    dir('GKE/DB/postgresql') {
-                        sh 'terraform apply --auto-approve'
-                    }
-                }
-            }
-        }
 
         stage('Post-Deployment Verification') {
             steps {
