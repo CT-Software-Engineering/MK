@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Deploy to GCP') {
             steps {
-                script {
+                script { // Using the script block without change
                     def envName = env.BRANCH_NAME
                     if (envName == 'development') {
                         // Deploy to development environment
@@ -36,7 +36,7 @@ pipeline {
 
         stage("Authenticate to GCP") {
             steps {
-                script {
+                script { // Specify closure parameter explicitly
                     try {
                         withCredentials([file(credentialsId: "${GCP_CREDENTIALS_ID}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                             sh "echo 'GITHUB_CREDENTIALS_ID is set to: ${GITHUB_CREDENTIALS_ID}'"
