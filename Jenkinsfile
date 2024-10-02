@@ -1,17 +1,14 @@
 pipeline {
     agent any
     environment {
-    
-    GCP_PROJECT_ID = 'militaryknowledge'
-    GKE_CLUSTER_NAME = 'my-gke-cluster'
-    GKE_CLUSTER_ZONE = 'europe-west1-b'
-    GITHUB_CREDENTIALS_ID = '92229892-c431-4b3b-927f-6e43e5be5946' // Add this line
-    GCP_CREDENTIALS_ID = 'b20451ad-020d-4043-8f19-a8b4aede503c' // Add new GCP credentials ID
-    //GOOGLE_APPLICATION_CREDENTIALS = credentials('0908ac63252abd9765af6a4aecea10820a7a4b5b')
-
+        GCP_PROJECT_ID = 'militaryknowledge'
+        GKE_CLUSTER_NAME = 'my-gke-cluster'
+        GKE_CLUSTER_ZONE = 'europe-west1-b'
+        GITHUB_CREDENTIALS_ID = '92229892-c431-4b3b-927f-6e43e5be5946' // Add this line
+        GCP_CREDENTIALS_ID = 'b20451ad-020d-4043-8f19-a8b4aede503c' // Add new GCP credentials ID
+        //GOOGLE_APPLICATION_CREDENTIALS = credentials('0908ac63252abd9765af6a4aecea10820a7a4b5b')
     }
     stages {
-
         stage('Deploy to GCP') {
             steps {
                 script {
@@ -23,7 +20,7 @@ pipeline {
                     } else if (envName == 'production') {
                         // Deploy to production environment
                     }
-                }        
+                }
             }
         }
 
@@ -36,60 +33,62 @@ pipeline {
                 }
             }
         }
+
         stage("Authenticate to GCP") {
-    steps {
-        script {
-            try {
-                withCredentials([file(credentialsId: "${GCP_CREDENTIALS_ID}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                    sh "echo 'GITHUB_CREDENTIALS_ID is set to: ${GITHUB_CREDENTIALS_ID}'"
-                    sh "if [ -f \"${GITHUB_CREDENTIALS_ID}\" ]; then echo 'GCP key file exists'; else echo 'GCP key file does not exist'; fi"
-                    sh "gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}"
-                    sh "gcloud config set project ${GCP_PROJECT_ID}"
-                    sh "gcloud auth list"
-                }
-            } catch (Exception e) {
-                echo "An error occurred during GCP authentication: ${e.getMessage()}"
-                currentBuild.result = 'FAILURE'
-                error("GCP authentication failed")
-            }
-        }
-    }
-}
-
-
-
-         stage('Initializing Terraform'){
-            steps{
-                script{
-                    dir('GKE'){
-                         sh 'terraform init'
+            steps {
+                script {
+                    try {
+                        withCredentials([file(credentialsId: "${GCP_CREDENTIALS_ID}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                            sh "echo 'GITHUB_CREDENTIALS_ID is set to: ${GITHUB_CREDENTIALS_ID}'"
+                            sh "if [ -f \"${GITHUB_CREDENTIALS_ID}\" ]; then echo 'GCP key file exists'; else echo 'GCP key file does not exist'; fi"
+                            sh "gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}"
+                            sh "gcloud config set project ${GCP_PROJECT_ID}"
+                            sh "gcloud auth list"
+                        }
+                    } catch (Exception e) {
+                        echo "An error occurred during GCP authentication: ${e.getMessage()}"
+                        currentBuild.result = 'FAILURE'
+                        error("GCP authentication failed")
                     }
                 }
             }
         }
-        stage('Formating terraform code'){
-            steps{
-                script{
-                    dir('GKE'){
-                         sh 'terraform fmt -recursive'
+
+        stage('Initializing Terraform') {
+            steps {
+                script {
+                    dir('GKE') {
+                        sh 'terraform init'
                     }
                 }
             }
         }
-        stage('Validating Terraform'){
-            steps{
-                script{
-                    dir('GKE'){
-                         sh 'terraform validate'
+
+        stage('Formatting Terraform Code') {
+            steps {
+                script {
+                    dir('GKE') {
+                        sh 'terraform fmt -recursive'
                     }
                 }
             }
         }
-        stage('Previewing the infrastructure'){
-            steps{
-                script{
-                    dir('GKE'){
-                         sh 'terraform plan'
+
+        stage('Validating Terraform') {
+            steps {
+                script {
+                    dir('GKE') {
+                        sh 'terraform validate'
+                    }
+                }
+            }
+        }
+
+        stage('Previewing the Infrastructure') {
+            steps {
+                script {
+                    dir('GKE') {
+                        sh 'terraform plan'
                     }
                     //input(message: "Are you sure to proceed?", ok: "proceed")
                 }
@@ -98,27 +97,36 @@ pipeline {
 
         stage('Refresh Terraform State') {
             steps {
-               dir('GKE') {
-                sh 'terraform refresh'
+                dir('GKE') {
+                    sh 'terraform refresh'
+                }
+            }
         }
-    }
-}
 
-        stage('Creating/Destroying an GKE cluster'){
-            steps{
-                script{
-                    dir('GKE'){
-                         //sh 'terraform $action --auto-approve'
-                         //sh 'terraform apply --auto-approve'
-                         sh 'terraform destroy --auto-approve'
+        stage('Creating/Destroying a GKE Cluster') {
+            steps {
+                script {
+                    dir('GKE') {
+                        //sh 'terraform $action --auto-approve'
+                        //sh 'terraform apply --auto-approve'
+                        sh 'terraform destroy --auto-approve'
                     }
                 }
             }
         }
-/*
 
-        
+        // New stage for building databases
+        stage('Building Databases') {
+            steps {
+                script {
+                    // Add your database build commands here
+                    sh 'echo "Building databases..."'
+                    // Example command: sh 'some-database-command'
+                }
+            }
+        }
 
+        /*
         stage('Initializing Helm') {
             steps {
                 script {
@@ -153,10 +161,8 @@ pipeline {
             steps {
                 script {
                     //sh 'helm upgrade jenkins bitnami/jenkins --namespace mk --create-namespace --kubeconfig "/var/lib/jenkins/workspace/mk/.kube/config"'
-                    sh 'helm install j
-                    enkins bitnami/jenkins --namespace mk --create-namespace --kubeconfig "/var/lib/jenkins/workspace/mk/.kube/config"'
+                    sh 'helm install jenkins bitnami/jenkins --namespace mk --create-namespace --kubeconfig "/var/lib/jenkins/workspace/mk/.kube/config"'
                     //sh 'helm uninstall jenkins bitnami/jenkins --namespace mk --create-namespace --kubeconfig "/var/lib/jenkins/workspace/mk/.kube/config"'
-                    
                 }
             }
         }
@@ -170,20 +176,21 @@ pipeline {
             }
         }
 
-        stage("Deploying Nginx"){
-            steps{
-                script{
+        stage("Deploying Nginx") {
+            steps {
+                script {
                     withCredentials([file(credentialsId: "${GITHUB_CREDENTIALS_ID}", variable: 'GITHUB_CREDENTIALS_ID')]) {
-                    sh "gcloud auth activate-service-account --key-file=${GITHUB_CREDENTIALS_ID}"
-                    sh "gcloud config set project militaryknowledge"
-                    dir('GKE/configuration-files'){
-                    sh "gcloud container clusters get-credentials ${GKE_CLUSTER_NAME} --zone ${GKE_CLUSTER_ZONE} --project ${GCP_PROJECT_ID}"
-                    sh 'kubectl apply -f deployment.yml --validate=false'
-                    sh 'kubectl apply -f service.yml --validate=false'
+                        sh "gcloud auth activate-service-account --key-file=${GITHUB_CREDENTIALS_ID}"
+                        sh "gcloud config set project militaryknowledge"
+                        dir('GKE/configuration-files') {
+                            sh "gcloud container clusters get-credentials ${GKE_CLUSTER_NAME} --zone ${GKE_CLUSTER_ZONE} --project ${GCP_PROJECT_ID}"
+                            sh 'kubectl apply -f deployment.yml --validate=false'
+                            sh 'kubectl apply -f service.yml --validate=false'
+                        }
+                    }
                 }
-             }
+            }
         }
         */
     }
 }
-
