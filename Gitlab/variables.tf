@@ -1,46 +1,30 @@
 variable "project_id" {
   description = "The GCP project ID"
-  type        = string
   default     = "militaryknowledge"
 }
-
 variable "region" {
   description = "The GCP region"
-  type        = string
   default     = "europe-west1"
-
 }
-
 variable "zone" {
   description = "The GCP zone"
-  type        = string
   default     = "europe-west1-b"
-
 }
-
 variable "vpc_name" {
   description = "The name of the existing VPC"
   type        = string
   default     = "militaryknowledge-vpc"
 
 }
-
-# variable "nat_ip" {
-#   description = "The static IP address for the NAT gateway"
-#   type        = string
-#   default     = "null"
-# }
-
-variable "cluster_name" {
-  description = "Name of the GKE cluster"
-  type        = string
-  default     = "militaryknowledge-cluster"
+variable "gitlab_instance_name" {
+  type    = string
+  default = "gitlab-server"
 }
+
 variable "machine_type" {
   description = "The machine type for the GKE nodes"
   type        = string
   default     = "e2-medium"
-
 }
 variable "subnetwork" {
   type        = string
@@ -57,4 +41,14 @@ variable "public_subnet" {
   type        = string
   description = "The name of the existing public subnet"
   default     = "militaryknowledge-public-subnet"
+}
+
+variable "ssh_allowed_ips" {
+  type    = list(string)
+  default = ["0.0.0.0/0"] # Adjust to restrict SSH access to specific developer IP ranges
+}
+
+variable "gitlab_disk_size" {
+  type    = string
+  default = "50"
 }

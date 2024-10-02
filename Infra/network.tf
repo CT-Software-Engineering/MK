@@ -11,7 +11,9 @@ resource "google_compute_subnetwork" "public_subnet" {
   ip_cidr_range            = "10.0.1.0/24"
   private_ip_google_access = true
 
+
   purpose = "PRIVATE"
+
 }
 resource "google_compute_subnetwork" "private_subnet" {
   name          = "${var.project_id}-private-subnet"
@@ -69,17 +71,26 @@ resource "google_compute_firewall" "allow_egress" {
   target_tags        = ["jenkins"]
 }
 
-#use this option to secure that egress is only used for ssh to self hosted gitlab
-# resource "google_compute_firewall" "allow_gitlab_ssh" {
-#   name    = "allow-jenkins-to-gitlab-ssh"
-#   network = google_compute_network.vpc.name
+## Create Cloud Router
 
-#   allow {
-#     protocol = "tcp"
-#     ports    = ["22"]
-#   }
+resource "google_compute_router" "router" {
+  project = var.project_id
+  name    = var.nat_router
+  network = var.vpc_name
+  region  = var.region
+}
 
-#   direction          = "EGRESS"
-#   destination_ranges = ["10.110.2.170]/32"]  # Replace with GitLab server's IP
-#   target_tags        = ["jenkins"]
-# }
+## Create Nat Gateway
+
+resource "google_compute_router_nat" "nat" {
+  name                               = var.my_nat_gateway
+  router                             = var.nat_router
+  region                             = var.region
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+
+  log_config {
+    enable = true
+    filter = "ERRORS_ONLY"
+  }
+}
