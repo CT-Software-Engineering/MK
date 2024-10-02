@@ -4,9 +4,8 @@ pipeline {
         GCP_PROJECT_ID = 'militaryknowledge'
         GKE_CLUSTER_NAME = 'my-gke-cluster'
         GKE_CLUSTER_ZONE = 'europe-west1-b'
-        GITHUB_CREDENTIALS_ID = '92229892-c431-4b3b-927f-6e43e5be5946' // Add this line
-        GCP_CREDENTIALS_ID = 'b20451ad-020d-4043-8f19-a8b4aede503c' // Add new GCP credentials ID
-        // GOOGLE_APPLICATION_CREDENTIALS = credentials('0908ac63252abd9765af6a4aecea10820a7a4b5b')
+        GITHUB_CREDENTIALS_ID = '92229892-c431-4b3b-927f-6e43e5be5946'
+        GCP_CREDENTIALS_ID = 'b20451ad-020d-4043-8f19-a8b4aede503c'
     }
     stages {
         stage('Deploy to GCP') {
