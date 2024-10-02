@@ -11,7 +11,7 @@ pipeline {
     stages {
         stage('Deploy to GCP') {
             steps {
-                script { // Using the script block without change
+                script { // Use a closure explicitly
                     def envName = env.BRANCH_NAME
                     if (envName == 'development') {
                         // Deploy to development environment
@@ -26,7 +26,7 @@ pipeline {
 
         stage('Checkout SCM') {
             steps {
-                script {
+                script { // Use a closure explicitly
                     checkout scmGit(branches: [[name: '*/main']],
                                     extensions: [],
                                     userRemoteConfigs: [[url: 'https://github.com/CT-Software-Engineering/MK.git', credentialsId: "${GITHUB_CREDENTIALS_ID}"]])
@@ -36,7 +36,7 @@ pipeline {
 
         stage("Authenticate to GCP") {
             steps {
-                script { // Specify closure parameter explicitly
+                script { // Use a closure explicitly
                     try {
                         withCredentials([file(credentialsId: "${GCP_CREDENTIALS_ID}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                             sh "echo 'GITHUB_CREDENTIALS_ID is set to: ${GITHUB_CREDENTIALS_ID}'"
@@ -56,7 +56,7 @@ pipeline {
 
         stage('Initializing Terraform') {
             steps {
-                script {
+                script { // Use a closure explicitly
                     dir('GKE') {
                         sh 'terraform init'
                     }
@@ -66,7 +66,7 @@ pipeline {
 
         stage('Formatting Terraform Code') {
             steps {
-                script {
+                script { // Use a closure explicitly
                     dir('GKE') {
                         sh 'terraform fmt -recursive'
                     }
@@ -76,7 +76,7 @@ pipeline {
 
         stage('Validating Terraform') {
             steps {
-                script {
+                script { // Use a closure explicitly
                     dir('GKE') {
                         sh 'terraform validate'
                     }
@@ -86,7 +86,7 @@ pipeline {
 
         stage('Previewing the Infrastructure') {
             steps {
-                script {
+                script { // Use a closure explicitly
                     dir('GKE') {
                         sh 'terraform plan'
                         // input(message: "Are you sure to proceed?", ok: "proceed")
@@ -97,7 +97,7 @@ pipeline {
 
         stage('Refresh Terraform State') {
             steps {
-                script {
+                script { // Use a closure explicitly
                     dir('GKE') {
                         sh 'terraform refresh'
                     }
@@ -107,7 +107,7 @@ pipeline {
 
         stage('Creating/Destroying a GKE Cluster') {
             steps {
-                script {
+                script { // Use a closure explicitly
                     dir('GKE') {
                         // sh 'terraform $action --auto-approve'
                         sh 'terraform apply --auto-approve'
@@ -119,7 +119,7 @@ pipeline {
 
         stage('Initialize Terraform - GraphDB') {
             steps {
-                script {
+                script { // Use a closure explicitly
                     dir('GKE/DB/graphdb') {
                         sh 'terraform init'
                     }
@@ -129,7 +129,7 @@ pipeline {
 
         stage('Apply Terraform - GraphDB') {
             steps {
-                script {
+                script { // Use a closure explicitly
                     dir('GKE/DB/graphdb') {
                         sh 'terraform apply --auto-approve'
                     }
@@ -139,7 +139,7 @@ pipeline {
 
         stage('Initialize Terraform - PostgreSQL') {
             steps {
-                script {
+                script { // Use a closure explicitly
                     dir('GKE/DB/postgresql') {
                         sh 'terraform init'
                     }
@@ -149,7 +149,7 @@ pipeline {
 
         stage('Apply Terraform - PostgreSQL') {
             steps {
-                script {
+                script { // Use a closure explicitly
                     dir('GKE/DB/postgresql') {
                         sh 'terraform apply --auto-approve'
                     }
@@ -159,7 +159,7 @@ pipeline {
 
         stage('Post-Deployment Verification') {
             steps {
-                script {
+                script { // Use a closure explicitly
                     // Optional: Add verification steps if needed, e.g., checking DB connection.
                 }
             }
