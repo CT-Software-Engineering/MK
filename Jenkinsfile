@@ -109,12 +109,48 @@ pipeline {
                 script{
                     dir('GKE'){
                          //sh 'terraform $action --auto-approve'
-                         //sh 'terraform apply --auto-approve'
-                         sh 'terraform destroy --auto-approve'
+                         sh 'terraform apply --auto-approve'
+                         //sh 'terraform destroy --auto-approve'
                     }
                 }
             }
         }
+
+        stage('Initialize Terraform - Databases') {
+            steps {
+                script {
+                    dir('GKE/DB/graphdb') {
+                        sh 'terraform init'
+                    }
+                    dir('GKE/DB/postgresql') {
+                        sh 'terraform init'
+                    }
+                }
+            }
+        }
+
+        stage('Apply Terraform - Databases') {
+            steps {
+                script {
+                    dir('GKE/DB/graphdb') {
+                        sh 'terraform apply --auto-approve'
+                    }
+                    dir('GKE/DB/postgresql') {
+                        sh 'terraform apply --auto-approve'
+                    }
+                }
+            }
+        }
+
+        stage('Post-Deployment Verification') {
+            steps {
+                script {
+                    // Optional: Add verification steps if needed, e.g., checking DB connection.
+                }
+            }
+        }
+    }
+
 /*
 
         
