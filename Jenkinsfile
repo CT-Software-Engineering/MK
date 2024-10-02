@@ -115,13 +115,52 @@ pipeline {
             }
         }
 
-        // New stage for building databases
-        stage('Building Databases') {
+       // Stage for initializing and applying the GraphDB Terraform configuration
+        stage('Initializing GraphDB Terraform') {
             steps {
                 script {
-                    // Add your database build commands here
-                    sh 'echo "Building databases..."'
-                    // Example command: sh 'some-database-command'
+                    dir('GKE/DB/graphdb') {
+                        sh 'terraform init'
+                    }
+                }
+            }
+        }
+
+        stage('Applying GraphDB Terraform') {
+            steps {
+                script {
+                    dir('GKE/DB/graphdb') {
+                        sh 'terraform apply --auto-approve'
+                    }
+                }
+            }
+        }
+
+        // Stage for initializing and applying the PostgreSQL Terraform configuration
+        stage('Initializing PostgreSQL Terraform') {
+            steps {
+                script {
+                    dir('GKE/DB/postgresql') {
+                        sh 'terraform init'
+                    }
+                }
+            }
+        }
+
+        stage('Applying PostgreSQL Terraform') {
+            steps {
+                script {
+                    dir('GKE/DB/postgresql') {
+                        sh 'terraform apply --auto-approve'
+                    }
+                }
+            }
+        }
+
+        stage('Post-Deployment Verification') {
+            steps {
+                script {
+                    // Optional: Add verification steps if needed, e.g., checking DB connection.
                 }
             }
         }
