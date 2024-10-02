@@ -119,15 +119,25 @@ pipeline {
 
         
 
-        stage('Initializing Helm') {
+        stage('Install Jenkins with Helm') {
             steps {
                 script {
                     sh 'helm repo add bitnami https://charts.bitnami.com/bitnami'
                     sh 'helm repo update'
+                                  
+                    sh 'helm install jenkins bitnami/jenkins --namespace mk --create-namespace --kubeconfig "/var/lib/jenkins/workspace/mk/.kube/config"'
                 }
             }
         }
         
+               stage('Verify Jenkins Deployment') {
+            steps {
+                script {
+                    sh 'kubectl get pods -n mk --kubeconfig "$KUBECONFIG"'
+                    sh 'kubectl get svc -n mk --kubeconfig "$KUBECONFIG"'
+                }
+            }
+        }
         stage('Check Helm Installation') {
             steps {
                 script {
@@ -186,4 +196,44 @@ pipeline {
         */
     }
 }
+stage('Initialize Terraform - Databases') {
+            steps {
+                script {
+                    // Initialize Terraform for GraphDB
+                    dir('GKE/DB/graphdb') {
+                        sh 'terraform init'
+                    }
 
+                    // Initialize Terraform for PostgreSQL
+                    dir('GKE/DB/postgresql') {
+                        sh 'terraform init'
+                    }
+                }
+            }
+        }
+
+        stage('Apply Terraform - Databases') {
+            steps {
+                script {
+                    // Deploy GraphDB
+                    dir('GKE/DB/graphdb') {
+                        sh 'terraform apply --auto-approve'
+                    }
+
+                    // Deploy PostgreSQL
+                    dir('GKE/DB/postgresql') {
+                        sh 'terraform apply --auto-approve'
+                    }
+                }
+            }
+        }
+
+        stage('Post-Deployment Verification') {
+            steps {
+                script {
+                    // Optional: Add verification steps if needed, e.g., checking DB connection.
+                }
+            }
+        }
+    }
+}
