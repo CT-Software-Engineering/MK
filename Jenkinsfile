@@ -131,7 +131,7 @@ pipeline {
             steps {
                 script {
                     dir('GKE/DB/graphdb') {
-                        sh 'terraform apply -var-file="terraform.tfvars" --auto-approve'
+                        sh 'terraform apply --auto-approve'
                     }
                 }
             }
