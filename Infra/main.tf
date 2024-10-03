@@ -15,8 +15,8 @@ resource "google_project_iam_member" "gke_service_account_roles" {
     "roles/monitoring.metricWriter",
     "roles/storage.admin",
     "roles/stackdriver.resourceMetadata.writer",
-    "roles/serviceusage.serviceUsageAdmin",
-    "roles/editor"
+    "roles/serviceusage.serviceUsageConsumer",
+    "roles/viewer"
   ])
 
   project = var.project_id
