@@ -116,7 +116,47 @@ pipeline {
             }
         }
 
+        // Stage for initializing and applying the GraphDB Terraform configuration
+        stage('Initializing GraphDB Terraform') {
+            steps {
+                script {
+                    dir('GKE/DB/graphdb') {
+                        sh 'terraform init'
+                    }
+                }
+            }
+        }
 
+        stage('Applying GraphDB Terraform') {
+            steps {
+                script {
+                    dir('GKE/DB/graphdb') {
+                        sh 'terraform apply --auto-approve'
+                    }
+                }
+            }
+        }
+
+        // Stage for initializing and applying the PostgreSQL Terraform configuration
+        stage('Initializing PostgreSQL Terraform') {
+            steps {
+                script {
+                    dir('GKE/DB/postgresql') {
+                        sh 'terraform init'
+                    }
+                }
+            }
+        }
+
+        stage('Applying PostgreSQL Terraform') {
+            steps {
+                script {
+                    dir('GKE/DB/postgresql') {
+                        sh 'terraform apply --auto-approve'
+                    }
+                }
+            }
+        }
 /*
         stage('Initializing Helm') {
             steps {
