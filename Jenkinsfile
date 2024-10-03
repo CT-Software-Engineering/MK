@@ -37,15 +37,15 @@ pipeline {
             }
         }
         stage("Authenticate to GCP") {
-    steps {
-        script {
-            try {
-                withCredentials([file(credentialsId: "${GCP_CREDENTIALS_ID}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                    sh "echo 'GITHUB_CREDENTIALS_ID is set to: ${GITHUB_CREDENTIALS_ID}'"
-                    sh "if [ -f \"${GITHUB_CREDENTIALS_ID}\" ]; then echo 'GCP key file exists'; else echo 'GCP key file does not exist'; fi"
-                    sh "gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}"
-                    sh "gcloud config set project ${GCP_PROJECT_ID}"
-                    sh "gcloud auth list"
+            steps {
+                script {
+                try {
+                    withCredentials([file(credentialsId: "${GCP_CREDENTIALS_ID}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                        sh "echo 'GITHUB_CREDENTIALS_ID is set to: ${GITHUB_CREDENTIALS_ID}'"
+                        sh "if [ -f \"${GITHUB_CREDENTIALS_ID}\" ]; then echo 'GCP key file exists'; else echo 'GCP key file does not exist'; fi"
+                        sh "gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}"
+                        sh "gcloud config set project ${GCP_PROJECT_ID}"
+                        sh "gcloud auth list"
                 }
             } catch (Exception e) {
                 echo "An error occurred during GCP authentication: ${e.getMessage()}"
@@ -55,10 +55,7 @@ pipeline {
         }
     }
 }
-
-
-
-         stage('Initializing Terraform'){
+        stage('Initializing Terraform'){
             steps{
                 script{
                     dir('GKE'){
@@ -67,6 +64,7 @@ pipeline {
                 }
             }
         }
+        
         stage('Formating terraform code'){
             steps{
                 script{
@@ -76,6 +74,7 @@ pipeline {
                 }
             }
         }
+        
         stage('Validating Terraform'){
             steps{
                 script{
@@ -85,6 +84,7 @@ pipeline {
                 }
             }
         }
+        
         stage('Previewing the infrastructure'){
             steps{
                 script{
@@ -109,16 +109,15 @@ pipeline {
                 script{
                     dir('GKE'){
                          //sh 'terraform $action --auto-approve'
-                         //sh 'terraform apply --auto-approve'
-                         sh 'terraform destroy --auto-approve'
+                         sh 'terraform apply --auto-approve'
+                         //sh 'terraform destroy --auto-approve'
                     }
                 }
             }
         }
+
+
 /*
-
-        
-
         stage('Initializing Helm') {
             steps {
                 script {
@@ -141,6 +140,7 @@ pipeline {
                 }
             }
         }
+        
         stage('Update Kubeconfig') {
             steps {
                 script {
