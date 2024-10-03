@@ -8,28 +8,7 @@ terraform {
 }
 
 provider "kubernetes" {
-  host  = "https://${local.kubernetes_internal_ip}:6443" # Use dynamically fetched internal IP
-  token = var.kubernetes_token
-}
-
-resource "null_resource" "fetch_internal_ip" {
-  provisioner "local-exec" {
-    command = "./get_internal_ip.sh > internal_ip.txt"
-  }
-
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-}
-
-data "local_file" "internal_ip" {
-  filename = "internal_ip.txt"
-
-  depends_on = [null_resource.fetch_internal_ip]
-}
-
-locals {
-  kubernetes_internal_ip = chomp(data.local_file.internal_ip.content)
+  config_path = "~/.kube/config" # Adjust this path if needed
 }
 
 resource "kubernetes_namespace" "neo4j" {
@@ -46,6 +25,41 @@ resource "kubernetes_secret" "neo4j_secrets" {
 
   data = {
     NEO4J_AUTH = "neo4j/${var.neo4j_password}"
+  }
+}
+
+resource "kubernetes_persistent_volume" "neo4j_pv" {
+  metadata {
+    name = "neo4j-pv"
+  }
+
+  spec {
+    capacity = {
+      storage = "10Gi" # Adjust size as needed
+    }
+    access_modes = ["ReadWriteOnce"]
+
+    persistent_volume_source {
+      host_path {
+        path = "/data/neo4j" # Change this to your desired host path if needed
+      }
+    }
+  }
+}
+
+resource "kubernetes_persistent_volume_claim" "neo4j_pvc" {
+  metadata {
+    name      = "neo4j-pvc"
+    namespace = kubernetes_namespace.neo4j.metadata[0].name
+  }
+
+  spec {
+    access_modes = ["ReadWriteOnce"]
+    resources {
+      requests = {
+        storage = "10Gi" # Should match the PersistentVolume size
+      }
+    }
   }
 }
 
@@ -93,13 +107,15 @@ resource "kubernetes_deployment" "neo4j" {
 
           volume_mount {
             name       = "neo4j-data"
-            mount_path = "/data"
+            mount_path = "/data" # Neo4j stores its data here
           }
         }
 
         volume {
           name = "neo4j-data"
-          empty_dir {}
+          persistent_volume_claim {
+            claim_name = kubernetes_persistent_volume_claim.neo4j_pvc.metadata[0].name
+          }
         }
       }
     }
@@ -111,6 +127,7 @@ resource "kubernetes_service" "neo4j" {
     name      = "neo4j"
     namespace = kubernetes_namespace.neo4j.metadata[0].name
   }
+
   spec {
     selector = {
       app = kubernetes_deployment.neo4j.spec[0].template[0].metadata[0].labels.app
@@ -125,31 +142,6 @@ resource "kubernetes_service" "neo4j" {
       target_port = 7687
       name        = "bolt"
     }
+    type = "ClusterIP" # Change this if you need a different service type
   }
-}
-
-resource "null_resource" "fetch_cluster_ip" {
-  provisioner "local-exec" {
-    command = "./get_cluster_ip.sh > cluster_ip.txt"
-  }
-
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-
-  depends_on = [kubernetes_service.neo4j]
-}
-
-data "local_file" "cluster_ip" {
-  filename = "cluster_ip.txt"
-
-  depends_on = [null_resource.fetch_cluster_ip]
-}
-
-locals {
-  neo4j_cluster_ip = chomp(data.local_file.cluster_ip.content)
-}
-
-output "neo4j_cluster_ip" {
-  value = local.neo4j_cluster_ip
 }
