@@ -34,7 +34,7 @@ variable "vpc_name" {
 variable "cluster_name" {
   description = "Name of the GKE cluster"
   type        = string
-  default     = "militaryknowledge_cluster"
+  default     = "militaryknowledge-cluster"
 }
 variable "machine_type" {
   description = "The machine type for the GKE nodes"
