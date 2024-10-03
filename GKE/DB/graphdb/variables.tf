@@ -14,7 +14,7 @@ variable "kubernetes_token" {
 variable "kubernetes_ca_cert" {
   description = "Kubernetes CA Certificate"
   type        = string
-  #sensitive   = true
+  sensitive   = true
   
 }
 
