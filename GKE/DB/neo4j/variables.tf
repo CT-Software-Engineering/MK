@@ -1,7 +1,7 @@
 variable "kubernetes_host" {
   description = "The hostname (in form of URI) of the Kubernetes API."
   type        = string
-  default     = "35.195.134.144"     # Replace with the appropriate IP address or hostname
+  default     = "35.195.134.144" # Replace with the appropriate IP address or hostname
 }
 
 variable "kubernetes_token" {
@@ -15,7 +15,7 @@ variable "kubernetes_ca_cert" {
   description = "Kubernetes CA Certificate"
   type        = string
   sensitive   = true
-  
+
 }
 
 variable "neo4j_password" {
@@ -46,7 +46,7 @@ variable "zone" {
 variable "gke_cluster_name" {
   description = "The name of the GKE cluster"
   type        = string
-  default     = "militaryknowledge-cluster"
+  default     = "my_cluster"
 }
 
 variable "gke_cluster_location" {
@@ -54,3 +54,9 @@ variable "gke_cluster_location" {
   type        = string
   default     = "europe-west1-b"
 }
+variable "kubernetes_internal_ip" {
+  description = "the internal ip of the cluster"
+  type        = string
+  default     = "10.4.0.0/14"
+}
+ 

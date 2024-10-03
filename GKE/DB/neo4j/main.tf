@@ -8,10 +8,28 @@ terraform {
 }
 
 provider "kubernetes" {
-  host                   = "https://${var.kubernetes_host}"
-  token                  = var.kubernetes_token
-  cluster_ca_certificate = file("/etc/ssl/certs/ca-certificates.crt")
-  
+  host  = "https://${local.kubernetes_internal_ip}:6443" # Use dynamically fetched internal IP
+  token = var.kubernetes_token
+}
+
+resource "null_resource" "fetch_internal_ip" {
+  provisioner "local-exec" {
+    command = "./get_internal_ip.sh > internal_ip.txt"
+  }
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+}
+
+data "local_file" "internal_ip" {
+  filename = "internal_ip.txt"
+
+  depends_on = [null_resource.fetch_internal_ip]
+}
+
+locals {
+  kubernetes_internal_ip = chomp(data.local_file.internal_ip.content)
 }
 
 resource "kubernetes_namespace" "neo4j" {
@@ -109,6 +127,29 @@ resource "kubernetes_service" "neo4j" {
     }
   }
 }
+
+resource "null_resource" "fetch_cluster_ip" {
+  provisioner "local-exec" {
+    command = "./get_cluster_ip.sh > cluster_ip.txt"
+  }
+
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
+  depends_on = [kubernetes_service.neo4j]
+}
+
+data "local_file" "cluster_ip" {
+  filename = "cluster_ip.txt"
+
+  depends_on = [null_resource.fetch_cluster_ip]
+}
+
 locals {
-  kubernetes_ca_cert = file("/etc/ssl/certs/ca-certificates.crt")
+  neo4j_cluster_ip = chomp(data.local_file.cluster_ip.content)
+}
+
+output "neo4j_cluster_ip" {
+  value = local.neo4j_cluster_ip
 }

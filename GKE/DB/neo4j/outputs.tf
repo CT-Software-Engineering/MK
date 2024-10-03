@@ -7,3 +7,5 @@ output "neo4j_connection_string" {
   description = "Connection string for Neo4j (use with kubectl port-forward)"
   value       = "bolt://localhost:7687"
 }
+
+

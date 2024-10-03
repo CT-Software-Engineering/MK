@@ -1,16 +1,17 @@
-output "postgresql_instance_name" {
-  value = google_sql_database_instance.postgresql_instance.name
+# output "postgresql_instance_name" {
+#   value = google_sql_database_instance.postgresql_instance.name
+# }
+
+# output "postgresql_db_name" {
+#   value = google_sql_database.postgresql_db.name
+# }
+
+output "postgresql_user" {
+  value = var.postgresql_username
+  sensitive = true
 }
 
-output "postgresql_db_name" {
-  value = google_sql_database.postgresql_db.name
-}
-
-output "postgresql_user_name" {
-  value = google_sql_user.postgresql_user.name
-}
-
-output "postgresql_user_password" {
+output "postgresql_password" {
   value     = var.postgresql_password
   sensitive = true
 }
