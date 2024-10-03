@@ -131,7 +131,7 @@ pipeline {
             steps {
                 script {
                     dir('GKE/DB/graphdb') {
-                        sh 'terraform apply terraform apply -var="kubernetes_ca_cert=//etc/ssl/certs/ca-certificates.crt" --auto-approve'
+                        sh 'terraform apply -var="kubernetes_ca_cert=//etc/ssl/certs/ca-certificates.crt" --auto-approve'
                     }
                 }
             }
