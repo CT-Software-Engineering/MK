@@ -131,8 +131,8 @@ pipeline {
             steps {
                 script {
                     dir('GKE/DB/graphdb') {
-                        //sh 'terraform apply -var="kubernetes_ca_cert=//etc/ssl/certs/ca-certificates.crt" --auto-approve'
-                        sh 'terraform destroy -var="kubernetes_ca_cert=//etc/ssl/certs/ca-certificates.crt" --auto-approve'
+                        sh 'terraform apply -var="kubernetes_ca_cert=//etc/ssl/certs/ca-certificates.crt" --auto-approve'
+                        //sh 'terraform destroy -var="kubernetes_ca_cert=//etc/ssl/certs/ca-certificates.crt" --auto-approve'
                     }
                 }
             }
@@ -153,8 +153,8 @@ pipeline {
             steps {
                 script {
                     dir('GKE/DB/postgresql') {
-                        //sh 'terraform apply --auto-approve'
-                        sh 'terraform destroy --auto-approve'
+                        sh 'terraform apply --auto-approve'
+                        //sh 'terraform destroy --auto-approve'
                     }
                 }
             }
