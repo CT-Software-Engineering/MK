@@ -11,18 +11,18 @@ variable "kubernetes_token" {
   default     = "80019b7838ce1c49602edab7798515423d17b047" # Replace with the appropriate token
 }
 
-# variable "kubernetes_ca_cert" {
-#   description = "PEM-encoded root certificates bundle for TLS authentication."
-#   type        = string
-#   sensitive   = true
+variable "kubernetes_ca_cert" {
+  description = "Kubernetes CA Certificate"
+  type        = string
+  #sensitive   = true
   
-# }
+}
 
 variable "neo4j_password" {
   description = "Password for Neo4j database"
   type        = string
   sensitive   = true
-  default     = "XXXXXXXXXXXXXXXXXXXX" # Replace with the appropriate password
+  default     = "pa55Word" # Replace with the appropriate password
 }
 
 variable "project_id" {
