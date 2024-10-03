@@ -1,7 +1,7 @@
 variable "kubernetes_host" {
   description = "The hostname (in form of URI) of the Kubernetes API."
   type        = string
-  default     = "35.233.26.165" # Replace with the appropriate IP address or hostname
+  default     = "35.195.134.144"     //"35.233.26.165" # Replace with the appropriate IP address or hostname
 }
 
 variable "kubernetes_token" {
