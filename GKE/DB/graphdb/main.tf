@@ -10,7 +10,7 @@ terraform {
 provider "kubernetes" {
   host                   = "https://${var.kubernetes_host}"
   token                  = var.kubernetes_token
-  cluster_ca_certificate = base64decode(local.kubernetes_ca_cert)
+  cluster_ca_certificate = base64decode(var.kubernetes_ca_cert)
 }
 
 resource "kubernetes_namespace" "neo4j" {
