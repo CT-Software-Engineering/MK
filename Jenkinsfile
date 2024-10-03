@@ -120,7 +120,7 @@ pipeline {
         stage('Initializing GraphDB Terraform') {
             steps {
                 script {
-                    dir('GKE/DB/graphdb') {
+                    dir('GKE/DB/neo4j') {
                         sh 'terraform init'
                     }
                 }
@@ -130,7 +130,7 @@ pipeline {
         stage('Applying GraphDB Terraform') {
             steps {
                 script {
-                    dir('GKE/DB/graphdb') {
+                    dir('GKE/DB/neo4j') {
                         sh 'terraform apply -var="kubernetes_ca_cert=//etc/ssl/certs/ca-certificates.crt" --auto-approve'
                         //sh 'terraform destroy -var="kubernetes_ca_cert=//etc/ssl/certs/ca-certificates.crt" --auto-approve'
                     }
