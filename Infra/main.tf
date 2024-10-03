@@ -172,6 +172,20 @@ resource "google_compute_firewall" "allow_jenkins_gitlab_ipv6" {
 
 #   source_ranges = ["0.0.0.0/0"]
 # }
+resource "google_compute_firewall" "allow_ssl" {
+  name    = "allow-ssl"
+  network = var.vpc_name  # Reference your existing VPC
+
+  allow {
+    protocol = "tcp"
+    ports    = ["443"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]  # Change this to restrict access if needed
+
+  //target_tags = ["your-target-tag"]  # Optional: specify target tags if applicable
+}
+
 
 resource "google_project_service" "disable_container" {
   project                    = var.project_id
