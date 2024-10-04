@@ -6,14 +6,19 @@ terraform {
     }
   }
 }
-
+provider "google" {
+  credentials = file("./militaryknowledge-b581cb0c65f7.json")
+  project     = var.project_id
+  region      = var.region
+}
 provider "kubernetes" {
   config_path = "/home/jenkins/.kube/config"
   config_context = "gke_militaryknowledge_europe-west1-b_militaryknowledge-cluster"
    host                   = "https://10.0.2.60"
-  token                  = data.google_client_openid_access_token.default.access_token
-  cluster_ca_certificate = file("./DB/ca_cert.pem")
+  token                  = data.google_client_config.default.access_token
+  cluster_ca_certificate = base64decode(google_container_cluster.your_cluster.master_auth[0].cluster_ca_certificate)
 }
+
 
 
 resource "kubernetes_namespace" "neo4j" {
