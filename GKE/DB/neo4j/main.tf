@@ -8,8 +8,11 @@ terraform {
 }
 
 provider "kubernetes" {
-  config_path = "/home/jenkins/.kube/config" # Adjust this path if needed
+  config_path = "/home/jenkins/.kube/config"
+  config_context = "gke_militaryknowledge_europe-west1-b_militaryknowledge-cluster"
+  
 }
+
 
 resource "kubernetes_namespace" "neo4j" {
   metadata {
