@@ -10,7 +10,9 @@ terraform {
 provider "kubernetes" {
   config_path = "/home/jenkins/.kube/config"
   config_context = "gke_militaryknowledge_europe-west1-b_militaryknowledge-cluster"
-  
+   host                   = "https://10.0.2.60"
+  token                  = data.google_client_openid_access_token.default.access_token
+  cluster_ca_certificate = file("./DB/ca_cert.pem")
 }
 
 
