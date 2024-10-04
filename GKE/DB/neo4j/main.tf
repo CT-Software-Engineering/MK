@@ -8,7 +8,7 @@ terraform {
 }
 
 provider "kubernetes" {
-  config_path = "~/.kube/config" # Adjust this path if needed
+  config_path = "/home/jenkins/.kube/config" # Adjust this path if needed
 }
 
 resource "kubernetes_namespace" "neo4j" {

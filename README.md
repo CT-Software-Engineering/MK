@@ -4,6 +4,8 @@ no nat gateway has been created for Infrastructure there is however one in the G
 the Jenkins-Server is configured to connect to Github for CICD pipeline with SSH. 
 The SSH setup process is as follows:
 To set up a CI/CD pipeline from Jenkins to GitHub using SSH, you'll need to install and configure several Jenkins plugins. Here's a list of the essential plugins and some optional ones that can enhance your workflow: [1]
+Ensure all services are installed on Jenkins server especially kubectl
+Install sudo apt-get install google-cloud-cli-gke-gcloud-auth-plugin
 
 # API Services that need to be enabled in GCP:
 1. GKE Cluster Communication
