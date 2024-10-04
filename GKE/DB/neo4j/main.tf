@@ -6,11 +6,9 @@ terraform {
     }
   }
 }
-provider "google" {
-  credentials = file("./militaryknowledge-b581cb0c65f7.json")
-  project     = var.project_id
-  region      = var.region
-}
+
+
+
 provider "kubernetes" {
   config_path = "/home/jenkins/.kube/config"
   config_context = "gke_militaryknowledge_europe-west1-b_militaryknowledge-cluster"

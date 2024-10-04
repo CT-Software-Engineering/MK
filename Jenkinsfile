@@ -7,7 +7,7 @@ pipeline {
     GKE_CLUSTER_ZONE = 'europe-west1-b'
     GITHUB_CREDENTIALS_ID = '92229892-c431-4b3b-927f-6e43e5be5946' // Add this line
     GCP_CREDENTIALS_ID = 'b20451ad-020d-4043-8f19-a8b4aede503c' // Add new GCP credentials ID
-    //GOOGLE_APPLICATION_CREDENTIALS = credentials('0908ac63252abd9765af6a4aecea10820a7a4b5b')
+    GOOGLE_APPLICATION_CREDENTIALS = credentials('80019b7838ce1c49602edab7798515423d17b047')
 
     }
     stages {
@@ -104,21 +104,24 @@ pipeline {
     }
 }
 
-        stage('Creating/Destroying an GKE cluster'){
-            steps{
-                script{
-                    dir('GKE'){
-                         //sh 'terraform $action --auto-approve'
-                         sh 'terraform apply --auto-approve'
-                         //sh 'terraform destroy --auto-approve'
+        stage('Creating/Destroying an GKE cluster') {
+            steps {
+                withCredentials([file(credentialsId: env.GCP_CREDENTIALS_ID, variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    script {
+                        dir('GKE') {
+                            sh 'terraform apply --auto-approve'
+                            //sh 'terraform destroy --auto-approve'
+                        }
                     }
                 }
             }
         }
+        
 
-        // Stage for initializing and applying the GraphDB Terraform configuration
+        
         stage('Initializing GraphDB Terraform') {
             steps {
+                withCredentials([file(credentialsId: env.GCP_CREDENTIALS_ID, variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                 script {
                     dir('GKE/DB/neo4j') {
                         sh 'terraform init'
@@ -131,8 +134,8 @@ pipeline {
             steps {
                 script {
                     dir('GKE/DB/neo4j') {
-                        sh 'terraform apply -var="kubernetes_ca_cert=//etc/ssl/certs/ca-certificates.crt" --auto-approve'
-                        //sh 'terraform destroy -var="kubernetes_ca_cert=//etc/ssl/certs/ca-certificates.crt" --auto-approve'
+                        sh 'terraform apply --auto-approve'
+                        //sh 'terraform destroy --auto-approve'
                     }
                 }
             }
