@@ -5,7 +5,26 @@ the Jenkins-Server is configured to connect to Github for CICD pipeline with SSH
 The SSH setup process is as follows:
 To set up a CI/CD pipeline from Jenkins to GitHub using SSH, you'll need to install and configure several Jenkins plugins. Here's a list of the essential plugins and some optional ones that can enhance your workflow: [1]
 
-Essential plugins:
+# API Services that need to be enabled in GCP:
+1. GKE Cluster Communication
+Kubernetes Engine API: Required for creating and managing GKE clusters.
+2. Jenkins Server Communication
+Compute Engine API: If Jenkins is running on Compute Engine, this API will be necessary for any interactions with VM instances.
+Cloud Storage API: If you need to store artifacts or logs in Google Cloud Storage.
+Cloud Pub/Sub API: If you are using Pub/Sub for messaging between Jenkins and other services.
+Cloud SQL: Google Cloud SQL is a hosted and fully managed relational database service on Google's infrastructure.
+3. Database Connectivity
+Cloud SQL API: If you are using Cloud SQL for your databases, this API is essential for managing and connecting to your Cloud SQL instances.
+Firestore API: If you are using Firestore as your database.
+BigQuery API: If you need to connect to BigQuery for data analytics.
+4. Additional Services
+Identity and Access Management (IAM) API: To manage permissions related to your services.
+Service Management API: To manage and monitor your services.
+5. Database Migration API:Manage Cloud Database Migration Service resources on Google Cloud Platform.
+
+
+
+# Essential plugins:
 
 Git plugin
 
