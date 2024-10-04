@@ -226,9 +226,10 @@ pipeline {
                     sh 'kubectl apply -f deployment.yml --validate=false'
                     sh 'kubectl apply -f service.yml --validate=false'
                 }
-             }
+                    }
+                }
+            }
         }
         */
     }
 }
-
