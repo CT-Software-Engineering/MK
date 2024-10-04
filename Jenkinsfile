@@ -41,6 +41,8 @@ pipeline {
                 script {
                 try {
                     withCredentials([file(credentialsId: "${GCP_CREDENTIALS_ID}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                        echo "Using GCP credentials: ${GCP_CREDENTIALS_ID}"
+                        sh "echo 'GCP key file path: ${GOOGLE_APPLICATION_CREDENTIALS}'"
                         sh "echo 'GITHUB_CREDENTIALS_ID is set to: ${GITHUB_CREDENTIALS_ID}'"
                         sh "if [ -f \"${GITHUB_CREDENTIALS_ID}\" ]; then echo 'GCP key file exists'; else echo 'GCP key file does not exist'; fi"
                         sh "gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}"
