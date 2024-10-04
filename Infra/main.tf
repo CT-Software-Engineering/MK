@@ -10,14 +10,26 @@ resource "google_project_iam_member" "gke_service_account_roles" {
   for_each = toset([
     "roles/container.admin",
     "roles/compute.networkAdmin",
+    "roles/compute.instanceAdmin.v1",
+    "roles/compute.securityAdmin",
+    "roles/iam.admin",
     "roles/iam.serviceAccountUser",
+    "roles/iam.serviceAccountKeyAdmin",
     "roles/logging.logWriter",
+    "roles/logging.admin",
     "roles/monitoring.metricWriter",
+    "roles/monitoring.admin",
     "roles/storage.admin",
     "roles/stackdriver.resourceMetadata.writer",
     "roles/serviceusage.serviceUsageConsumer",
     "roles/viewer",
-    "roles/cloudsql.client"
+    "roles/cloudsql.client",
+    "roles/cloudsql.admin",
+     "roles/cloudsql.editor",
+     "roles/compute.admin",
+     "roles/.admin",   
+     "roles/billing.user"
+    
   ])
 
   project = var.project_id
