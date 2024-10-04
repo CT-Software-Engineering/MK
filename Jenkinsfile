@@ -215,17 +215,17 @@ pipeline {
             }
         }
 
-        stage("Deploying Nginx"){
-            steps{
-                script{
+        stage("Deploying Nginx") {
+            steps {
+                script {
                     withCredentials([file(credentialsId: "${GITHUB_CREDENTIALS_ID}", variable: 'GITHUB_CREDENTIALS_ID')]) {
-                    sh "gcloud auth activate-service-account --key-file=${GITHUB_CREDENTIALS_ID}"
-                    sh "gcloud config set project militaryknowledge"
-                    dir('GKE/configuration-files'){
-                    sh "gcloud container clusters get-credentials ${GKE_CLUSTER_NAME} --zone ${GKE_CLUSTER_ZONE} --project ${GCP_PROJECT_ID}"
-                    sh 'kubectl apply -f deployment.yml --validate=false'
-                    sh 'kubectl apply -f service.yml --validate=false'
-                }
+                        sh "gcloud auth activate-service-account --key-file=${GITHUB_CREDENTIALS_ID}"
+                        sh "gcloud config set project militaryknowledge"
+                        dir('GKE/configuration-files') {
+                            sh "gcloud container clusters get-credentials ${GKE_CLUSTER_NAME} --zone ${GKE_CLUSTER_ZONE} --project ${GCP_PROJECT_ID}"
+                            sh 'kubectl apply -f deployment.yml --validate=false'
+                            sh 'kubectl apply -f service.yml --validate=false'
+                        }
                     }
                 }
             }
