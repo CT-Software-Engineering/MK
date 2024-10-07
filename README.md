@@ -1,11 +1,14 @@
 # GKEMilitary
-# this template will build a Ubuntu Jenkins Server in a new VPC with one public subnet (can be increased if needed)
-no nat gateway has been created for Infrastructure there is however one in the GKE folder which builds the GKE Cluster.
-the Jenkins-Server is configured to connect to Github for CICD pipeline with SSH. 
+# this template will build a Ubuntu Jenkins Server in a new VPC with one public and one private subnet (can be increased if needed)
+A Nat gateway has been created for the private subnet.
+the Jenkins-Server can be configured to connect to Github or Gitlab both cloud and self hosted depending on the configuration for CICD pipeline with SSH or Personal Access Token. 
 The SSH setup process is as follows:
 To set up a CI/CD pipeline from Jenkins to GitHub using SSH, you'll need to install and configure several Jenkins plugins. Here's a list of the essential plugins and some optional ones that can enhance your workflow: [1]
 Ensure all services are installed on Jenkins server especially kubectl
 Install sudo apt-get install google-cloud-cli-gke-gcloud-auth-plugin
+
+To start the build using Terraform first a bucket has to be created.
+The bucket name that has been configured to use for remote state files = "militaryknowledge" this can be changed to anything but then each backend.tf file must be adjusted accordingly. 
 
 # API Services that need to be enabled in GCP:
 1. GKE Cluster Communication
