@@ -7,7 +7,7 @@ pipeline {
     GKE_CLUSTER_ZONE = 'europe-west1-b'
     GITHUB_CREDENTIALS_ID = '92229892-c431-4b3b-927f-6e43e5be5946' // Add this line
     GCP_CREDENTIALS_ID = 'b20451ad-020d-4043-8f19-a8b4aede503c' // Add new GCP credentials ID
-    GOOGLE_APPLICATION_CREDENTIALS = credentials('459cae27679f69a268b1632ac7e1abd843aaf697')
+    //GOOGLE_APPLICATION_CREDENTIALS = credentials('459cae27679f69a268b1632ac7e1abd843aaf697')
 
     }
     stages {
@@ -37,18 +37,15 @@ pipeline {
             }
         }
         stage("Authenticate to GCP") {
-            steps {
-                script {
-                try {
-                    withCredentials([file(credentialsId: "${GCP_CREDENTIALS_ID}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                        echo "Using GCP credentials: ${GCP_CREDENTIALS_ID}"
-                        sh "echo 'GCP key file path: ${GOOGLE_APPLICATION_CREDENTIALS}'"
-                        sh "echo 'GITHUB_CREDENTIALS_ID is set to: ${GITHUB_CREDENTIALS_ID}'"
-                        sh "if [ -f \"${GOOGLE_APPLICATION_CREDENTIALS}\" ]; then echo 'GCP key file exists'; else echo 'GCP key file does not exist'; fi"
-                        sh "if [ -f \"${GITHUB_CREDENTIALS_ID}\" ]; then echo 'GCP key file exists'; else echo 'GCP key file does not exist'; fi"
-                        sh "gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}"
-                        sh "gcloud config set project ${GCP_PROJECT_ID}"
-                        sh "gcloud auth list"
+    steps {
+        script {
+            try {
+                withCredentials([file(credentialsId: "${GCP_CREDENTIALS_ID}", variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    sh "echo 'GITHUB_CREDENTIALS_ID is set to: ${GITHUB_CREDENTIALS_ID}'"
+                    sh "if [ -f \"${GITHUB_CREDENTIALS_ID}\" ]; then echo 'GCP key file exists'; else echo 'GCP key file does not exist'; fi"
+                    sh "gcloud auth activate-service-account --key-file=${GOOGLE_APPLICATION_CREDENTIALS}"
+                    sh "gcloud config set project ${GCP_PROJECT_ID}"
+                    sh "gcloud auth list"
                 }
             } catch (Exception e) {
                 echo "An error occurred during GCP authentication: ${e.getMessage()}"
@@ -58,7 +55,10 @@ pipeline {
         }
     }
 }
-        stage('Initializing Terraform'){
+
+
+
+         stage('Initializing Terraform'){
             steps{
                 script{
                     dir('GKE'){
@@ -67,7 +67,6 @@ pipeline {
                 }
             }
         }
-        
         stage('Formating terraform code'){
             steps{
                 script{
@@ -77,7 +76,6 @@ pipeline {
                 }
             }
         }
-        
         stage('Validating Terraform'){
             steps{
                 script{
@@ -87,7 +85,6 @@ pipeline {
                 }
             }
         }
-        
         stage('Previewing the infrastructure'){
             steps{
                 script{
@@ -112,57 +109,16 @@ pipeline {
                 script{
                     dir('GKE'){
                          //sh 'terraform $action --auto-approve'
-                         sh 'terraform apply --auto-approve'
-                         //sh 'terraform destroy --auto-approve'
-                    }
-                }
-            }
-        }
-
-        // Stage for initializing and applying the GraphDB Terraform configuration
-        stage('Initializing GraphDB Terraform') {
-            steps {
-                script {
-                    dir('GKE/DB/neo4j') {
-                        sh 'terraform init'
-                    }
-                }
-            }
-        }
-
-        stage('Applying Neo4j Terraform') {
-            steps {
-                script {
-                    dir('GKE/DB/neo4j') {
-                        //sh 'terraform apply --auto-approve'
-                        sh 'terraform destroy --auto-approve'
-                    }
-                }
-            }
-        }
-
-        // Stage for initializing and applying the PostgreSQL Terraform configuration
-        stage('Initializing PostgreSQL Terraform') {
-            steps {
-                script {
-                    dir('GKE/DB/postgresql') {
-                        sh 'terraform init'
-                    }
-                }
-            }
-        }
-
-        stage('Applying PostgreSQL Terraform') {
-            steps {
-                script {
-                    dir('GKE/DB/postgresql') {
-                        sh 'terraform apply --auto-approve'
-                        //sh 'terraform destroy --auto-approve'
+                         //sh 'terraform apply --auto-approve'
+                         sh 'terraform destroy --auto-approve'
                     }
                 }
             }
         }
 /*
+
+        
+
         stage('Initializing Helm') {
             steps {
                 script {
@@ -185,7 +141,6 @@ pipeline {
                 }
             }
         }
-        
         stage('Update Kubeconfig') {
             steps {
                 script {
