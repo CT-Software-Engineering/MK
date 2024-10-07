@@ -12,7 +12,6 @@ resource "google_project_iam_member" "gke_service_account_roles" {
     "roles/compute.networkAdmin",
     "roles/compute.instanceAdmin.v1",
     "roles/compute.securityAdmin",
-    "roles/iam.admin",
     "roles/iam.serviceAccountUser",
     "roles/iam.serviceAccountKeyAdmin",
     "roles/logging.logWriter",
@@ -26,9 +25,7 @@ resource "google_project_iam_member" "gke_service_account_roles" {
     "roles/cloudsql.client",
     "roles/cloudsql.admin",
      "roles/cloudsql.editor",
-     "roles/compute.admin",
-     "roles/.admin",   
-     "roles/billing.user"
+     "roles/compute.admin"
     
   ])
 
