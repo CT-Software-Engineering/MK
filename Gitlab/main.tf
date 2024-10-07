@@ -27,7 +27,7 @@ resource "google_compute_disk" "gitlab_disk" {
 }
 
 # Create a GCE instance for GitLab
-resource "google_compute_instance" "gitlab" {
+resource "google_compute_instance" "gitlab-instance" {
   name         = var.gitlab_instance_name
   machine_type = var.machine_type
   zone         = var.zone
@@ -50,21 +50,23 @@ resource "google_compute_instance" "gitlab" {
       // Use an ephemeral public IP
     }
   }
+ 
 
-  metadata_startup_script = <<-EOF
-    #!/bin/bash
-    sudo apt-get update
-    sudo apt-get install -y curl openssh-server ca-certificates tzdata
-    curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh | sudo bash
-    sudo apt-get install -y gitlab-ee
-  EOF
+
+     metadata_startup_script = <<-EOF
+       !/bin/bash
+       sudo apt-get update
+       sudo apt-get install -y curl openssh-server ca-certificates tzdata
+       curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh | sudo bash
+       sudo apt-get install -y gitlab-ee
+    EOF
 }
 
 resource "null_resource" "update_gitlab_url" {
-  depends_on = [google_compute_instance.gitlab]
+  depends_on = [google_compute_instance.gitlab-instance]
 
   provisioner "local-exec" {
-    command = <<-EOT
+    command     = <<-EOT
       IP=$(terraform output -json gitlab_instance_ip | jq -r .value)
       echo "GitLab instance IP: $IP"
       gcloud compute ssh gitlab-server --zone ${var.zone} --command "sudo sed -i 's|http://<YOUR_IP_HERE>|http://$IP|g' /etc/gitlab/gitlab.rb && sudo gitlab-ctl reconfigure"

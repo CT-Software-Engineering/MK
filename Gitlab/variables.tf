@@ -18,13 +18,13 @@ variable "vpc_name" {
 }
 variable "gitlab_instance_name" {
   type    = string
-  default = "gitlab-server"
+  default = "gitlab-mkai-repo-vm"
 }
 
 variable "machine_type" {
   description = "The machine type for the GKE nodes"
   type        = string
-  default     = "e2-medium"
+  default     = "e2-custom-medium-5120"
 }
 variable "subnetwork" {
   type        = string
