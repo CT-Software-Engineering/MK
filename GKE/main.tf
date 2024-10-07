@@ -60,3 +60,6 @@ output "cluster_endpoint" {
   value = google_container_cluster.gke_cluster.endpoint
 
 }
+output "client_certificate" {
+  value = google_container_cluster.your_cluster.master_auth[0].client_certificate
+}

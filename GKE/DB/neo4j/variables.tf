@@ -59,4 +59,8 @@ variable "kubernetes_internal_ip" {
   type        = string
   default     = "10.4.0.0/14"
 }
- 
+variable "client_certificate" {
+  description = "gke client certificate"
+  type = string
+    
+}
