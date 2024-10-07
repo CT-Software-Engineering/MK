@@ -27,7 +27,7 @@ resource "google_compute_disk" "gitlab_disk" {
 }
 
 # Create a GCE instance for GitLab
-resource "google_compute_instance" "gitlab-instance" {
+resource "google_compute_instance" "gitlab" {
   name         = var.gitlab_instance_name
   machine_type = var.machine_type
   zone         = var.zone
@@ -63,7 +63,7 @@ resource "google_compute_instance" "gitlab-instance" {
 }
 
 resource "null_resource" "update_gitlab_url" {
-  depends_on = [google_compute_instance.gitlab-instance]
+  depends_on = [google_compute_instance.gitlab]
 
   provisioner "local-exec" {
     command     = <<-EOT
