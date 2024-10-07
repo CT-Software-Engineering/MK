@@ -7,7 +7,7 @@ pipeline {
     GKE_CLUSTER_ZONE = 'europe-west1-b'
     GITHUB_CREDENTIALS_ID = 'b10e0861-cebf-45c2-a187-9e41805fa049' // Add this line
     GCP_CREDENTIALS_ID = 'b20451ad-020d-4043-8f19-a8b4aede503c' // Add new GCP credentials ID
-    GOOGLE_APPLICATION_CREDENTIALS = credentials('459cae27679f69a268b1632ac7e1abd843aaf697')
+    //GOOGLE_APPLICATION_CREDENTIALS = credentials('459cae27679f69a268b1632ac7e1abd843aaf697')
 
     }
     stages {
