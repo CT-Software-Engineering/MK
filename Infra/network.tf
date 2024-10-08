@@ -100,7 +100,7 @@ resource "google_compute_global_address" "private_ip_address" {
   purpose       = "VPC_PEERING" # Correctly specify purpose
   address_type  = "INTERNAL"
   prefix_length = 16
-  network       = google_compute_network.vpc.id 
+  network       = google_compute_network.vpc.id
 }
 
 resource "google_service_networking_connection" "private_vpc_connection" {
@@ -201,15 +201,14 @@ resource "google_project_service" "disable_container" {
 #   disable_dependent_services = true
 #   depends_on                 = [google_service_account.gke_service_account]
 # }
-resource "google_compute_firewall" "iap_allow_ssh" {
+resource "google_compute_firewall" "allow_iap_ssh" {
   name    = "allow-ssh-from-iap"
-  network = google_compute_network.vpc.name # Ensure this is your VPC name
-
+  network = google_compute_network.vpc.name
   allow {
     protocol = "tcp"
     ports    = ["22"]
   }
 
   source_ranges = ["35.235.240.0/20"] # IAP's IP range
-  target_tags   = ["your-vm-tag"]     # Ensure you set the right network tag for your VM
+  target_tags   = ["jenkins"]         # Ensure you set the right network tag for your VM
 }

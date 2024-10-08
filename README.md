@@ -27,6 +27,12 @@ Identity and Access Management (IAM) API: To manage permissions related to your 
 Service Management API: To manage and monitor your services.
 5. Database Migration API:Manage Cloud Database Migration Service resources on Google Cloud Platform.
 
+# Automate the installation of the applications on the Jenkins server using the jenkins-startup-script.sh
+should the automation script not run automatically as it is made to do then
+1. login to the Jenkins Server using ssh console
+2. upload the jenkins-startup-script.sh file to the server 
+3. run with sudo ./jenkins-startup-script.sh
+
 
 
 # Essential plugins:
