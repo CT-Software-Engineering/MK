@@ -2,7 +2,7 @@
 resource "google_container_cluster" "gke_cluster" {
   name                = var.cluster_name
   project             = var.project_id
-  location            = var.zone    //change to region if you want to have a minimum of 3 nodes
+  location            = var.zone //change to region if you want to have a minimum of 3 nodes
   network             = var.vpc_name
   subnetwork          = var.private_subnet
   deletion_protection = false
@@ -60,6 +60,6 @@ output "cluster_endpoint" {
   value = google_container_cluster.gke_cluster.endpoint
 
 }
-output "client_certificate" {
-  value = google_container_cluster.your_cluster.master_auth[0].client_certificate
-}
+# output "client_certificate" {
+#   value = google_container_cluster.your_cluster.master_auth[0].client_certificate
+# }

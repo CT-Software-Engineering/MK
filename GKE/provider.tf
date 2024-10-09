@@ -8,8 +8,8 @@ terraform {
 }
 
 provider "google" {
-  project     = var.project_id
-  region      = var.region
+  project = var.project_id
+  region  = var.region
 }
 provider "kubernetes" {
   host                   = "https://${google_container_cluster.your_cluster.endpoint}"

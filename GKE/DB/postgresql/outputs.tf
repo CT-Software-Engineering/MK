@@ -1,17 +1,4 @@
-# output "postgresql_instance_name" {
-#   value = google_sql_database_instance.postgresql_instance.name
-# }
-
-# output "postgresql_db_name" {
-#   value = google_sql_database.postgresql_db.name
-# }
-
-output "postgresql_user" {
-  value = var.postgresql_username
-  sensitive = true
-}
-
-output "postgresql_password" {
-  value     = var.postgresql_password
-  sensitive = true
+output "postgresql_service_ip" {
+  description = "The IP address of the PostgreSQL service"
+  value       = kubernetes_service.postgresql.status[0].load_balancer[0].ingress[0].ip
 }

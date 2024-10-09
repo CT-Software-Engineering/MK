@@ -7,7 +7,7 @@ terraform {
   }
 
   backend "gcs" {
-    bucket = "militaryknowledge"
+    bucket = "militaryknowledge" # Replace with your GCS bucket name
     prefix = "postgresql/state"
   }
 }
@@ -16,8 +16,9 @@ provider "google" {
   project = var.project_id
   region  = var.region
 }
+
 provider "kubernetes" {
-  host  = "https://${local.kubernetes_internal_ip}:6443"  # Use dynamically fetched internal IP
+  host  = "https://${local.kubernetes_internal_ip}:6443"
   token = var.kubernetes_token
 }
 
@@ -117,6 +118,7 @@ resource "kubernetes_service" "postgresql" {
     name      = "postgresql"
     namespace = kubernetes_namespace.postgresql.metadata[0].name
   }
+
   spec {
     selector = {
       app = kubernetes_deployment.postgresql.spec[0].template[0].metadata[0].labels.app
@@ -129,28 +131,3 @@ resource "kubernetes_service" "postgresql" {
   }
 }
 
-resource "null_resource" "fetch_postgresql_cluster_ip" {
-  provisioner "local-exec" {
-    command = "./get_postgresql_cluster_ip.sh > postgresql_cluster_ip.txt"
-  }
-
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-
-  depends_on = [kubernetes_service.postgresql]
-}
-
-data "local_file" "postgresql_cluster_ip" {
-  filename = "postgresql_cluster_ip.txt"
-
-  depends_on = [null_resource.fetch_postgresql_cluster_ip]
-}
-
-locals {
-  postgresql_cluster_ip = chomp(data.local_file.postgresql_cluster_ip.content)
-}
-
-output "postgresql_cluster_ip" {
-  value = local.postgresql_cluster_ip
-}
