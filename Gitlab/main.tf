@@ -1,77 +1,62 @@
 provider "google" {
   project = var.project_id
   region  = var.region
-  zone    = var.zone
 }
 
-# Create a firewall rule to allow HTTPS and SSH traffic
+# Data source to find the existing VPC
+data "google_compute_network" "existing_vpc" {
+  name = var.vpc_name
+}
+
+# Data source to find the existing subnet
+data "google_compute_subnetwork" "existing_subnet" {
+  name   = var.private_subnet
+  region = var.region
+}
+
 resource "google_compute_firewall" "gitlab_firewall" {
-  name    = "${var.gitlab_instance_name}-firewall"
-  project = var.project_id
-  network = var.vpc_name # Change this if using a custom VPC
+  name    = "gitlab-firewall"
+  network = data.google_compute_network.existing_vpc.id
 
   allow {
     protocol = "tcp"
-    ports    = ["22", "443"] # Allow SSH, HTTPS
+    ports    = ["80", "443", "22"] # HTTP, HTTPS, SSH
   }
 
   source_ranges = ["0.0.0.0/0"]
 }
 
-# Create a persistent disk for GitLab
-resource "google_compute_disk" "gitlab_disk" {
-  name = "${var.gitlab_instance_name}-disk"
-  type = "pd-standard"
-  zone = var.zone
-  size = var.gitlab_disk_size
-}
-
-# Create a GCE instance for GitLab
-resource "google_compute_instance" "gitlab" {
+resource "google_compute_instance" "gitlab_instance" {
   name         = var.gitlab_instance_name
   machine_type = var.machine_type
   zone         = var.zone
-  project      = var.project_id
 
   boot_disk {
     initialize_params {
-      image = "ubuntu-os-cloud/ubuntu-2004-focal-v20210927" # Ubuntu 20.04 LTS
+      image = "ubuntu-os-cloud/ubuntu-2204-jammy-v20240927"
       size  = var.gitlab_disk_size
     }
   }
 
-  attached_disk {
-    source = google_compute_disk.gitlab_disk.id
-  }
-
   network_interface {
-    subnetwork = var.private_subnet # Specify your subnetwork here
+    subnetwork = data.google_compute_subnetwork.existing_subnet.id
     access_config {
-      // Use an ephemeral public IP
+      // Assign an ephemeral external IP address
     }
   }
- 
 
+  metadata_startup_script = <<-EOT
+    #!/bin/bash
+    apt-get update
+    apt-get install -y curl openssh-server ca-certificates
+    curl -s https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | sudo bash
+    EXTERNAL_URL="http://$(curl -s ifconfig.me)" apt-get install -y gitlab-ce
+    gitlab-ctl reconfigure
+  EOT
 
-     metadata_startup_script = <<-EOF
-       !/bin/bash
-       sudo apt-get update
-       sudo apt-get install -y curl openssh-server ca-certificates tzdata
-       curl https://packages.gitlab.com/install/repositories/gitlab/gitlab-ee/script.deb.sh | sudo bash
-       sudo apt-get install -y gitlab-ee
-    EOF
+  tags = ["gitlab"]
 }
 
-resource "null_resource" "update_gitlab_url" {
-  depends_on = [google_compute_instance.gitlab]
-
-  provisioner "local-exec" {
-    command     = <<-EOT
-      IP=$(terraform output -json gitlab_instance_ip | jq -r .value)
-      echo "GitLab instance IP: $IP"
-      gcloud compute ssh gitlab-server --zone ${var.zone} --command "sudo sed -i 's|http://<YOUR_IP_HERE>|http://$IP|g' /etc/gitlab/gitlab.rb && sudo gitlab-ctl reconfigure"
-    EOT
-    interpreter = ["bash", "-c"]
-  }
+output "external_ip" {
+  value = google_compute_instance.gitlab_instance.network_interface[0].access_config[0].nat_ip
 }
-
