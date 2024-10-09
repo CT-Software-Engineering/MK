@@ -31,7 +31,8 @@ Service Management API: To manage and monitor your services.
 should the automation script not run automatically as it is made to do then
 1. login to the Jenkins Server using ssh console
 2. upload the jenkins-startup-script.sh file to the server 
-3. run with sudo ./jenkins-startup-script.sh
+3. chmod +x ./jenkins-startup-script.sh
+4. run ./jenkins-startup-script.sh
 
 
 
