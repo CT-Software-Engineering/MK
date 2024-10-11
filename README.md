@@ -9,6 +9,7 @@ Install sudo apt-get install google-cloud-cli-gke-gcloud-auth-plugin
 
 To start the build using Terraform first a bucket has to be created.
 The bucket name that has been configured to use for remote state files = "militaryknowledge" this can be changed to anything but then each backend.tf file must be adjusted accordingly. 
+#########################################################################################################################################################
 
 # API Services that need to be enabled in GCP:
 1. GKE Cluster Communication
@@ -26,6 +27,7 @@ BigQuery API: If you need to connect to BigQuery for data analytics.
 Identity and Access Management (IAM) API: To manage permissions related to your services.
 Service Management API: To manage and monitor your services.
 5. Database Migration API:Manage Cloud Database Migration Service resources on Google Cloud Platform.
+##################################################################################################################################################
 
 # Automate the installation of the applications on the Jenkins server using the jenkins-startup-script.sh
 should the automation script not run automatically as it is made to do then
@@ -34,70 +36,50 @@ should the automation script not run automatically as it is made to do then
 3. chmod +x ./jenkins-startup-script.sh
 4. run ./jenkins-startup-script.sh
 
-
+##################################################################################################################################################
 
 # Essential plugins:
-
 Git plugin
-
 This is the core plugin for Git integration in Jenkins. [2]
-
 It allows Jenkins to clone repositories and interact with Git.
 
 GitHub plugin
-
 Provides deeper integration with GitHub, including webhook support.
 
 Credentials plugin
-
 Manages credentials for various purposes, including SSH keys.
 
 SSH Credentials plugin
-
 Allows you to store SSH private keys in Jenkins for authentication. [3]
 
 Optional but recommended plugins:
 
 Pipeline plugin
-
 Supports creating pipelines as code, which is a modern best practice for CI/CD.
 
 GitHub Branch Source plugin
-
 Automatically discovers branches and pull requests from GitHub.
 
 Blue Ocean plugin
-
 Provides a modern, visual interface for Jenkins pipelines.
 
 Workspace Cleanup plugin
-
 Helps keep your Jenkins workspace clean between builds.
-
-To install these plugins:
+################################################################################################################################################
+# To install these plugins:
 
 Go to "Manage Jenkins" > "Manage Plugins"
-
 Go to the "Available" tab
-
 Search for each plugin and check the box next to it
-
 Click "Install without restart" at the bottom of the page
-
-After installation, you'll need to configure Jenkins to use SSH for GitHub:
-
+After installation, you'll need to configure Jenkins to use SSH for GitHub: (or pat if ssh is not needed)
 Generate an SSH key pair if you haven't already.
-
 Add the public key to your GitHub account.
-
 In Jenkins, go to "Manage Jenkins" > "Manage Credentials"
-
 Add a new credential of type "SSH Username with private key"
-
 Paste your private key into the appropriate field.
-
 Then, when setting up your Jenkins job or pipeline:
-
 Use the Git plugin to specify your repository URL (use the SSH URL from GitHub).
-
 Select the SSH credential you created for authentication.
+
+################################################################################################################################################

@@ -115,7 +115,51 @@ pipeline {
                 }
             }
         }
-/*
+        // Stage for initializing and applying the GraphDB Terraform configuration
+        stage('Initializing GraphDB Terraform') {
+            steps {
+                script {
+                    dir('GKE/DB/neo4j') {
+                        sh 'terraform init'
+                    }
+                }
+            }
+        }
+
+        stage('Applying GraphDB Terraform') {
+            steps {
+                script {
+                    dir('GKE/DB/neo4j') {
+                        sh 'terraform apply -var="kubernetes_ca_cert=//etc/ssl/certs/ca-certificates.crt" --auto-approve'
+                        //sh 'terraform destroy -var="kubernetes_ca_cert=//etc/ssl/certs/ca-certificates.crt" --auto-approve'
+                    }
+                }
+            }
+        }
+
+        // Stage for initializing and applying the PostgreSQL Terraform configuration
+        stage('Initializing PostgreSQL Terraform') {
+            steps {
+                script {
+                    dir('GKE/DB/postgresql') {
+                        sh 'terraform init'
+                    }
+                }
+            }
+        }
+
+        stage('Applying PostgreSQL Terraform') {
+            steps {
+                script {
+                    dir('GKE/DB/postgresql') {
+                        sh 'terraform apply --auto-approve'
+                        //sh 'terraform destroy --auto-approve'
+                    }
+                }
+            }
+        }
+
+
 
         
 
@@ -127,7 +171,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Check Helm Installation') {
             steps {
                 script {
@@ -141,10 +185,11 @@ pipeline {
                 }
             }
         }
+
         stage('Update Kubeconfig') {
             steps {
                 script {
-                    sh 'aws eks update-kubeconfig --name mk --kubeconfig "/var/lib/jenkins/workspace/mk/.kube/config"'
+                    sh "gcloud container clusters get-credentials ${GKE_CLUSTER_NAME} --zone ${GKE_CLUSTER_ZONE} --project ${GCP_PROJECT_ID}"
                 }
             }
         }
@@ -152,11 +197,7 @@ pipeline {
         stage('Deploying Jenkins') {
             steps {
                 script {
-                    //sh 'helm upgrade jenkins bitnami/jenkins --namespace mk --create-namespace --kubeconfig "/var/lib/jenkins/workspace/mk/.kube/config"'
-                    sh 'helm install j
-                    enkins bitnami/jenkins --namespace mk --create-namespace --kubeconfig "/var/lib/jenkins/workspace/mk/.kube/config"'
-                    //sh 'helm uninstall jenkins bitnami/jenkins --namespace mk --create-namespace --kubeconfig "/var/lib/jenkins/workspace/mk/.kube/config"'
-                    
+                    sh 'helm install jenkins bitnami/jenkins --namespace mk --create-namespace --kubeconfig "/var/lib/jenkins/workspace/mk/.kube/config"'
                 }
             }
         }
@@ -164,8 +205,8 @@ pipeline {
         stage('Verify Jenkins Deployment') {
             steps {
                 script {
-                    sh 'kubectl get pods -n mk --kubeconfig "$KUBECONFIG"'
-                    sh 'kubectl get svc -n mk --kubeconfig "$KUBECONFIG"'
+                    sh 'kubectl get pods -n mk'
+                    sh 'kubectl get svc -n mk'
                 }
             }
         }
@@ -173,17 +214,16 @@ pipeline {
         stage("Deploying Nginx"){
             steps{
                 script{
-                    withCredentials([file(credentialsId: "${GITHUB_CREDENTIALS_ID}", variable: 'GITHUB_CREDENTIALS_ID')]) {
-                    sh "gcloud auth activate-service-account --key-file=${GITHUB_CREDENTIALS_ID}"
-                    sh "gcloud config set project militaryknowledge"
-                    dir('GKE/configuration-files'){
-                    sh "gcloud container clusters get-credentials ${GKE_CLUSTER_NAME} --zone ${GKE_CLUSTER_ZONE} --project ${GCP_PROJECT_ID}"
-                    sh 'kubectl apply -f deployment.yml --validate=false'
-                    sh 'kubectl apply -f service.yml --validate=false'
+                    withCredentials([file(credentialsId: "${GITLAB_CREDENTIALS_ID}", variable: 'GITLAB_CREDENTIALS_FILE')]) {
+                        sh "gcloud auth activate-service-account --key-file=${GITLAB_CREDENTIALS_FILE}"
+                        sh "gcloud config set project ${GCP_PROJECT_ID}"
+                        dir('GKE/configuration-files'){
+                            sh "kubectl apply -f deployment.yml --validate=false"
+                            sh "kubectl apply -f service.yml --validate=false"
+                        }
+                    }
                 }
-             }
+            }
         }
-        */
     }
 }
-
